@@ -1,20 +1,22 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Input from "../components/ui/Input";
 import Select from "../components/ui/Select";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
 import { crearPlanPago } from "../api/planPago.api";
 import { useNavigate } from "react-router-dom";
-import { useLocation } from "react-router-dom";
+import { getEntidadById } from "../api/entidadFinanciera.api";
 
 export default function Simulador() {
   const navigate = useNavigate();
-  const search = new URLSearchParams(useLocation().search);
-  const entidadFinancieraIdUrl = search.get("entidad") || "";
+  const entidadFinancieraIdUrl = JSON.parse(localStorage.getItem("entidadFinancieraId"));
+  const localIdUrl = JSON.parse(localStorage.getItem("localId"));
+  const user = JSON.parse(localStorage.getItem("user"));
+  const [entidadFinanciera, setEntidadFinanciera] = useState({});
 
   const [form, setForm] = useState({
-    localId: 1,
-    userId: 1,
+    localId: localIdUrl,
+    userId: user.id,
     entidadFinancieraId: entidadFinancieraIdUrl,
     precio_venta: "",
     cuota_inicial: "",
@@ -24,10 +26,15 @@ export default function Simulador() {
     tipo_tasa: "EFECTIVA",
     tasa_interes_anual: "",
     capitalizacion: "",
-    periodo_gracia_tipo: "SIN_GRACIA",
-    periodo_gracia_meses: 0
+    riodo_gracia_tipo: "SIN_GRACIA",
+    odo_gracia_meses: 0
   });
 
+  useEffect(() => {
+    getEntidadById(entidadFinancieraIdUrl).then(r => setEntidadFinanciera(r.data));
+  }, []);
+
+  console.log(entidadFinanciera);
   const update = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -61,8 +68,6 @@ export default function Simulador() {
 
       <div className="flex flex-col gap-3">
 
-        <Input label="Entidad Financiera ID" name="entidadFinancieraId" value={form.entidadFinancieraId} onChange={update} />
-
         <Input label="Precio Venta" name="precio_venta" value={form.precio_venta} onChange={update} />
 
         <Input label="Cuota Inicial" name="cuota_inicial" value={form.cuota_inicial} onChange={update} />
@@ -84,7 +89,13 @@ export default function Simulador() {
 
         <Input label="Tasa Interés Anual" name="tasa_interes_anual" value={form.tasa_interes_anual} onChange={update} />
 
-        <Input label="Capitalización (solo si es nominal)" name="capitalizacion" value={form.capitalizacion} onChange={update} />
+        <Input
+          label="Capitalización (solo si es nominal)"
+          name="capitalizacion"
+          value={form.capitalizacion}
+          onChange={update}
+          disabled={form.tipo_tasa === "EFECTIVA"}
+        />
 
         <Select label="Periodo de Gracia" name="periodo_gracia_tipo" value={form.periodo_gracia_tipo} onChange={update}>
           <option value="SIN_GRACIA">Sin Gracia</option>

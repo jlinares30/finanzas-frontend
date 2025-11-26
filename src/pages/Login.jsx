@@ -21,7 +21,7 @@ const onSubmit = async () => {
       alert(data.message || "Credenciales incorrectas");
       return;
     }
-
+    console.log("Login exitoso:", data);
     localStorage.setItem("token", data.token);
     localStorage.setItem("user", JSON.stringify(data.user));
 

@@ -13,6 +13,7 @@ export default function Register() {
     password: "",
     gender: "",
     birthdate: "",
+    age: "",
     dni: ""
   });
 
@@ -20,9 +21,16 @@ export default function Register() {
 
   const onSubmit = async () => {
     const resp = await postRegister(form);
-    const user = resp.data.user;
+    const data = resp.data;
 
-    localStorage.setItem("user", JSON.stringify(user));
+      if (!data.success) {
+        alert("Error al registrar");
+        return;
+      }
+    console.log("Registro exitoso:", data);
+    localStorage.setItem("token", resp.data.token);
+
+    localStorage.setItem("user", JSON.stringify(resp.data.user));
 
     navigate("/socioeconomico");
   };
@@ -37,6 +45,7 @@ export default function Register() {
         <Input label="Password" type="password" name="password" value={form.password} onChange={update} />
         <Input label="DNI" name="dni" value={form.dni} onChange={update} />
         <Input label="Género" name="gender" value={form.gender} onChange={update} />
+        <Input label="Edad" name="age" value={form.age} onChange={update} />
         <Input label="Fecha de nacimiento" type="date" name="birthdate" value={form.birthdate} onChange={update} />
 
         <Button className="mt-4 w-full" onClick={onSubmit}>
