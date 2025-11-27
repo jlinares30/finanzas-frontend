@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { getLocales } from "../api/locales.api";
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
+import Profile from "../components/ui/Profile";
 
 export default function LocalList() {
   const [locales, setLocales] = useState([]);
@@ -21,9 +22,10 @@ export default function LocalList() {
 
   return (
     <div className="p-6 min-h-screen bg-gray-50">
-      <h2 className="text-2xl font-bold mb-6">
-        Selecciona un Local / Vivienda
-      </h2>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold">Selecciona un Local / Vivienda</h2>
+        <Profile />
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {locales.map((local) => (

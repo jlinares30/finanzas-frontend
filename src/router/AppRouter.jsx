@@ -10,6 +10,8 @@ import LocalList from "../pages/LocalList";
 import DetalleLocal from "../pages/DetalleLocal";
 import MainLayout from "../layout/MainLayout";
 import ProtectedRoute from "./ProtectedRoute";
+import ProfilePage from "../pages/ProfilePage";
+import HistoryPage from "../pages/HistoryPage";
 
 export default function AppRouter() {
   return (
@@ -68,6 +70,22 @@ export default function AppRouter() {
             element={
               <ProtectedRoute>
                 <Resultado />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/history"
+            element={
+              <ProtectedRoute>
+                <HistoryPage />
               </ProtectedRoute>
             }
           />
