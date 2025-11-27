@@ -7,14 +7,15 @@ import { crearPlanPago } from "../api/planPago.api"; // Asegúrate de que esto s
 import { useNavigate } from "react-router-dom";
 import { getEntidadById } from "../api/entidadFinanciera.api";
 import { getLocalById } from "../api/locales.api";
+import { useSimulationStore } from "../store/useSimulationStore";
+import { useAuthStore } from "../store/useAuthStore";
 
 export default function Simulador() {
   const navigate = useNavigate();
 
-  // IDs desde LocalStorage
-  const entidadFinancieraIdUrl = JSON.parse(localStorage.getItem("entidadFinancieraId"));
-  const localIdUrl = JSON.parse(localStorage.getItem("localId"));
-  const user = JSON.parse(localStorage.getItem("user"));
+  // IDs desde Store
+  const { entidadFinancieraId: entidadFinancieraIdUrl, localId: localIdUrl } = useSimulationStore();
+  const user = useAuthStore((state) => state.user);
 
   // Estados de datos
   const [entidadFinanciera, setEntidadFinanciera] = useState(null); // Iniciar en null para validar carga
@@ -163,6 +164,15 @@ export default function Simulador() {
             value={form.num_anios}
             onChange={update}
           />
+          <Select
+            label="Frecuencia de Pago"
+            name="frecuencia_pago"
+            value={form.frecuencia_pago}
+            onChange={update}
+          >
+            <option value="mensual">Mensual</option>
+            <option value="anual">Anual</option>
+          </Select>
 
         </div>
 

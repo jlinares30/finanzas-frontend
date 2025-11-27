@@ -4,38 +4,34 @@ import Card from "../components/ui/Card";
 import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
 import { postLogin } from "../api/auth.api";
+import { useAuthStore } from "../store/useAuthStore";
 
 export default function Login() {
   const navigate = useNavigate();
+  const login = useAuthStore((state) => state.login);
   const [form, setForm] = useState({ email: "", password: "" });
 
   const update = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-const onSubmit = async () => {
-  try {
-    const resp = await postLogin(form);
-    const data = resp.data;
+  const onSubmit = async () => {
+    try {
+      const resp = await postLogin(form);
+      const data = resp.data;
 
-    // El backend debe devolver un token si todo está bien
-    if (!data.token) {
-      alert(data.message || "Credenciales incorrectas");
-      return;
+      // El backend debe devolver un token si todo está bien
+      if (!data.token) {
+        alert(data.message || "Credenciales incorrectas");
+        return;
+      }
+      console.log("Login exitoso:", data);
+      login(data.token, data.user);
+
+      navigate("/");
+    } catch (error) {
+      console.error(error);
+      alert("Error de conexión con el servidor");
     }
-    console.log("Login exitoso:", data);
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(data.user));
-
-    if (data.user?.id) {
-      localStorage.setItem("userId", data.user.id);
-    }
-
-    navigate("/");
-  } catch (error) {
-    console.error(error);
-    alert("Error de conexión con el servidor");
-  }
-};
-
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">

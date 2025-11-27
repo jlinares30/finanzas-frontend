@@ -4,9 +4,11 @@ import Card from "../components/ui/Card";
 import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
 import { postRegister } from "../api/auth.api";
+import { useAuthStore } from "../store/useAuthStore";
 
 export default function Register() {
   const navigate = useNavigate();
+  const login = useAuthStore((state) => state.login);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -23,14 +25,12 @@ export default function Register() {
     const resp = await postRegister(form);
     const data = resp.data;
 
-      if (!data.success) {
-        alert("Error al registrar");
-        return;
-      }
+    if (!data.success) {
+      alert("Error al registrar");
+      return;
+    }
     console.log("Registro exitoso:", data);
-    localStorage.setItem("token", resp.data.token);
-
-    localStorage.setItem("user", JSON.stringify(resp.data.user));
+    login(resp.data.token, resp.data.user);
 
     navigate("/socioeconomico");
   };

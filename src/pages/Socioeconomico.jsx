@@ -5,10 +5,11 @@ import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
 import { postSocioeconomico } from "../api/auth.api";
 
+import { useAuthStore } from "../store/useAuthStore";
+
 export default function Socioeconomico() {
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
-  const user = JSON.parse(localStorage.getItem("user"));
+  const { token, user } = useAuthStore();
 
 
   const [form, setForm] = useState({

@@ -4,8 +4,11 @@ import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import { useNavigate } from "react-router-dom";
 
+import { useAuthStore } from "../store/useAuthStore";
+
 export default function Home() {
   const navigate = useNavigate();
+  const logout = useAuthStore((state) => state.logout);
   const [entidades, setEntidades] = useState([]);
 
   useEffect(() => {
@@ -22,9 +25,7 @@ export default function Home() {
     <div className="p-6">
       <h2 className="text-xl font-bold mb-4">Selecciona una Entidad Financiera</h2>
       <Button className="mt-3" onClick={() => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        localStorage.removeItem("userId");
+        logout();
         navigate("/login");
       }}>
         Log out

@@ -3,10 +3,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import { getLocalById } from "../api/locales.api";
+import { useSimulationStore } from "../store/useSimulationStore";
 
 export default function DetalleLocal() {
   const { localId, entidadId } = useParams();
   const navigate = useNavigate();
+  const setSimulationData = useSimulationStore((state) => state.setSimulationData);
 
   const [local, setLocal] = useState(null);
   const [costoInicial, setCostoInicial] = useState(null);
@@ -33,8 +35,7 @@ export default function DetalleLocal() {
 
   const seleccionarLocal = () => {
     if (!local) return;
-    localStorage.setItem("localId", local.id);
-    localStorage.setItem("entidadFinancieraId", entidadId);
+    setSimulationData(entidadId, local.id);
     navigate(`/simulador`);
   };
 

@@ -1,5 +1,7 @@
+import { useAuthStore } from "../store/useAuthStore";
+
 export const api = async (url, options = {}) => {
-  const token = localStorage.getItem("token");
+  const { token } = useAuthStore.getState();
 
   const headers = {
     "Content-Type": "application/json",
