@@ -51,7 +51,7 @@ export default function LocalList() {
             </div>
 
             <Button
-              className="mt-4 w-full"
+              className="mt-4 w-full bg-green-600 hover:bg-green-700"
               onClick={() => seleccionarLocal(local.id)}
             >
               Seleccionar

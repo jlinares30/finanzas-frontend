@@ -40,7 +40,7 @@ export default function Home() {
             {e.periodos_gracia_permitidos !== "SIN_GRACIA" && <p className="text-sm">Gracia: Hasta {e.max_meses_gracia} meses</p>}
             {e.periodos_gracia_permitidos !== "SIN_GRACIA" && <p className="text-sm">({e.periodos_gracia_permitidos})</p>}
             <p className="text-sm">Bono Techo Propio: {e.aplica_bono_techo_propio === true ? "Aplica" : "No Aplica"}</p>
-            <Button className="mt-3" onClick={() => seleccionar(e.id)}  >
+            <Button className="mt-3 bg-green-600 hover:bg-green-700" onClick={() => seleccionar(e.id)}  >
               Elegir
             </Button>
           </Card>
