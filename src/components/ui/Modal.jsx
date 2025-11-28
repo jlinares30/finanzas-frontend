@@ -14,8 +14,15 @@ export default function Modal({ isOpen, onClose, title, children }) {
     if (!isOpen) return null;
 
     return createPortal(
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto flex flex-col">
+
+        <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+            onClick={onClose}
+        >
+            <div
+                className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto flex flex-col"
+                onClick={(e) => e.stopPropagation()}
+            >
                 <div className="flex justify-between items-center p-4 border-b">
                     <h3 className="text-xl font-bold text-gray-800">{title}</h3>
                     <button
@@ -29,11 +36,11 @@ export default function Modal({ isOpen, onClose, title, children }) {
                 <div className="p-6 overflow-y-auto flex-1">
                     {children}
                 </div>
-                <div className="p-4 border-t flex justify-end">
+                {/* <div className="p-4 border-t flex justify-end">
                     <Button onClick={onClose} className="bg-gray-500 hover:bg-gray-600">
                         Cerrar
                     </Button>
-                </div>
+                </div> */}
             </div>
         </div>,
         document.body

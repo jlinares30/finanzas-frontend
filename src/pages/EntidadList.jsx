@@ -42,12 +42,32 @@ export default function EntidadList() {
         navigate("/simulador");
     };
 
+    // LÓGICA DE FILTRADO Y ORDENAMIENTO
+    const entidadesFiltradas = entidades.filter(entidad => {
+        if (!local) return true;
+
+        return true;
+    }).sort((a, b) => {
+        const precioLocal = Number(local?.precio || 0);
+        const esTechoPropio = precioLocal <= 128900;
+
+        if (esTechoPropio) {
+
+            if (a.aplica_bono_techo_propio && !b.aplica_bono_techo_propio) return -1;
+            if (!a.aplica_bono_techo_propio && b.aplica_bono_techo_propio) return 1;
+        }
+        return Number(a.tasa_interes) - Number(b.tasa_interes);
+    });
+
     const isRecommended = (entidad) => {
-        return entidad.tasa_interes < 0.15 || entidad.periodos_gracia_permitidos === 'TOTAL' || entidad.periodos_gracia_permitidos === 'AMBOS';
+        return Number(entidad.tasa_interes) < 0.12;
     };
 
     if (loading) return <div className="p-6">Cargando...</div>;
 
+    //Orden de prioridad 
+    //Si el precio es menor a 128900 se ordena por entidad que aplica bono techo propio
+    //tasa de interes menor a 12% 
     return (
         <div className="p-6 min-h-screen bg-gray-50">
             <div className="flex justify-between items-center mb-6">
@@ -57,38 +77,58 @@ export default function EntidadList() {
             {local && <p className="mb-6 text-gray-600">Para el local: <strong>{local.nombre}</strong></p>}
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                {entidades.map((entidad) => {
+                {entidadesFiltradas.map((entidad) => {
                     const recommended = isRecommended(entidad);
+
+                    // Verificación visual de moneda
+                    const mismaMoneda = local && local.moneda === entidad.moneda;
+
                     return (
                         <Card
                             key={entidad.id}
-                            className={`shadow-md transition-all ${recommended ? 'border-2 border-green-500 bg-green-50' : ''}`}
+                            className={`shadow-md transition-all relative overflow-hidden ${recommended ? 'border-2 border-green-500 bg-green-50' : 'bg-white'}`}
                         >
                             {recommended && (
-                                <div className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full w-fit mb-2">
-                                    Recomendado
+                                <div className="absolute top-0 right-0 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
+                                    Mejor Tasa
                                 </div>
                             )}
 
-                            <h3 className="text-lg font-semibold">{entidad.nombre}</h3>
-                            <p className="text-sm text-gray-600 mb-2">{entidad.descripcion}</p>
+                            <h3 className="text-lg font-bold text-gray-800 mt-2">{entidad.nombre}</h3>
 
-                            <div className="text-sm space-y-1">
-                                <p className="text-sm">Tasa: {formatPercent(entidad.tasa_interes)} {entidad.tipo_tasa == "EFECTIVA" ? entidad.frecuencia_efectiva : entidad.frecuencia_nominal}</p>
-                                <p className="text-sm">Tipo de Tasa: {entidad.tipo_tasa}</p>
-                                <p className="text-sm">Moneda: {entidad.moneda}</p>
-                                {entidad.capitalizacion && <p className="text-sm">Capitalización: {entidad.capitalizacion}</p>}
-                                <p className="text-sm">Periodo de Gracia: {entidad.periodos_gracia_permitidos !== "SIN_GRACIA" ? "Aplica" : "No Aplica"}</p>
-                                {entidad.periodos_gracia_permitidos !== "SIN_GRACIA" && <p className="text-sm">Gracia: Hasta {entidad.max_meses_gracia} meses</p>}
-                                {entidad.periodos_gracia_permitidos !== "SIN_GRACIA" && <p className="text-sm">({entidad.periodos_gracia_permitidos})</p>}
-                                <p className="text-sm">Bono Techo Propio: {entidad.aplica_bono_techo_propio === true ? "Aplica" : "No Aplica"}</p>
+                            {/* Tags informativos */}
+                            <div className="flex gap-2 my-2 flex-wrap">
+                                <span className={`text-xs px-2 py-1 rounded font-semibold ${entidad.moneda === 'PEN' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}`}>
+                                    {entidad.moneda === 'PEN' ? 'Soles' : 'Dólares'}
+                                </span>
+                                {!mismaMoneda && (
+                                    <span className="text-xs px-2 py-1 rounded bg-orange-100 text-orange-800 font-semibold">
+                                        Requiere Cambio
+                                    </span>
+                                )}
+                                {entidad.aplica_bono_techo_propio && (
+                                    <span className="text-xs px-2 py-1 rounded bg-blue-100 text-blue-800 font-semibold">
+                                        Acepta Bono
+                                    </span>
+                                )}
+                            </div>
+
+                            <div className="text-sm space-y-2 text-gray-600 mt-3">
+                                <div className="flex justify-between border-b pb-1">
+                                    <span>Tasa ({entidad.tipo_tasa === "EFECTIVA" ? "TEA" : "TNA"}):</span>
+                                    <span className="font-bold text-gray-900">{formatPercent(entidad.tasa_interes)}</span>
+                                </div>
+                                <div className="flex justify-between border-b pb-1">
+                                    <span>Gracia:</span>
+                                    <span>{entidad.periodos_gracia_permitidos !== "SIN_GRACIA" ? `Hasta ${entidad.max_meses_gracia} meses` : "No"}</span>
+                                </div>
                             </div>
 
                             <Button
-                                className={`mt-4 w-full ${recommended ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'}`}
+                                className={`mt-4 w-full ${recommended ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-800 hover:bg-gray-900'}`}
                                 onClick={() => seleccionarEntidad(entidad.id)}
                             >
-                                Seleccionar
+                                Simular con {entidad.moneda}
                             </Button>
                         </Card>
                     );

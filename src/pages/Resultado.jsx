@@ -1,10 +1,13 @@
+import { useState } from "react";
 import { useLocation, Link } from "react-router-dom";
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
+import Modal from "../components/ui/Modal";
 import { formatMoney, formatPercent } from "../utils/format";
 
 export default function Resultado() {
   const { state } = useLocation();
+  const [showDiagnostico, setShowDiagnostico] = useState(false);
 
   if (!state) return <div className="p-8 text-center text-gray-500">No hay resultados para mostrar. Inicia una nueva simulación.</div>;
 
@@ -13,7 +16,33 @@ export default function Resultado() {
   // Helpers de formato
   const currency = plan.moneda || "PEN";
 
-  console.log(indicadores);
+  console.log(plan);
+
+  // --- DIAGNÓSTICO FINANCIERO ---
+  const renderDiagnostico = () => {
+    const cok = Number(plan.cok);
+    const tcea = Number(indicadores.tcea);
+
+    // Si el usuario no puso COK (es 0), no podemos opinar
+    if (!cok || cok === 0) return null;
+
+    const esConveniente = tcea < cok;
+
+    return (
+      <div className={`p-4 rounded-lg border-l-4 mb-6 shadow-sm ${esConveniente ? 'bg-green-50 border-green-500' : 'bg-orange-50 border-orange-500'}`}>
+        <h3 className={`font-bold text-lg ${esConveniente ? 'text-green-800' : 'text-orange-800'}`}>
+          {esConveniente ? "✅ Oportunidad Financiera (Apalancamiento Positivo)" : "⚠️ Costo Financiero Elevado"}
+        </h3>
+        <p className="text-sm text-gray-700 mt-1">
+          {esConveniente
+            ? `¡Te conviene! La TCEA del banco (${formatPercent(tcea)}) es menor a tu capacidad de inversión (COK ${formatPercent(cok)}). Estás obteniendo financiamiento "barato" respecto a lo que rinde tu dinero.`
+            : `Cuidado. El crédito te cuesta (${formatPercent(tcea)}), que es más de lo que rinde tu dinero (${formatPercent(cok)}). Financieramente, te convendría pagar una cuota inicial mayor para endeudarte menos.`
+          }
+        </p>
+      </div>
+    );
+  };
+  // ----------------------------------------
 
   return (
     <div className="p-4 max-w-6xl mx-auto flex flex-col gap-6 font-sans text-gray-800">
@@ -106,11 +135,21 @@ export default function Resultado() {
 
         {/* COLUMNA 3: INDICADORES */}
         <Card className="h-full border-l-4 border-l-purple-600 bg-gradient-to-br from-white to-purple-50">
-          <h3 className="font-bold text-purple-800 border-b border-purple-100 pb-2 mb-3">3. Rentabilidad y Costo</h3>
+          <div className="flex justify-between items-center border-b border-purple-100 pb-2 mb-3">
+            <h3 className="font-bold text-purple-800">3. Rentabilidad y Costo</h3>
+            <button
+              onClick={() => setShowDiagnostico(true)}
+              className="text-xs text-purple-600 hover:text-purple-800 underline flex items-center gap-1"
+            >
+              <span>ℹ️ Ver Análisis</span>
+            </button>
+          </div>
 
           <div className="flex justify-between items-end mb-4">
             <span className="text-gray-600 text-sm font-medium">TCEA (Costo Real):</span>
-            <span className="text-3xl font-bold text-purple-700">{formatPercent(indicadores.tcea)}</span>
+            <span className={`text-3xl font-bold ${Number(indicadores.tcea) > Number(plan.cok) && Number(plan.cok) > 0 ? 'text-orange-600' : 'text-purple-700'}`}>
+              {formatPercent(indicadores.tcea)}
+            </span>
           </div>
 
           <div className="space-y-2 text-xs text-gray-600 bg-white p-3 rounded border border-purple-100 shadow-sm">
@@ -182,6 +221,10 @@ export default function Resultado() {
           </table>
         </div>
       </Card>
+
+      <Modal isOpen={showDiagnostico} onClose={() => setShowDiagnostico(false)} title="Diagnóstico Financiero">
+        {renderDiagnostico()}
+      </Modal>
     </div>
   );
 }

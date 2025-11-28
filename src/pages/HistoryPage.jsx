@@ -134,7 +134,7 @@ export default function HistoryPage() {
                                 <p><span className="font-semibold">Plazo:</span> {selectedPlan.num_anios} años ({selectedPlan.total_cuotas} cuotas)</p>
                                 <p><span className="font-semibold">Frecuencia:</span> {selectedPlan.frecuencia_pago}</p>
                                 <p><span className="font-semibold">Tasa Interés:</span> {(parseFloat(selectedPlan.EntidadFinanciera?.tasa_interes) * 100).toFixed(2)}% ({selectedPlan.EntidadFinanciera?.tipo_tasa})</p>
-                                <p><span className="font-semibold">Periodo Gracia:</span> {selectedPlan.tipo_gracia} ({selectedPlan.meses_gracia} meses)</p>
+                                <p><span className="font-semibold">Periodo Gracia:</span> {selectedPlan.tipo_gracia !== "SIN_GRACIA" ? selectedPlan.tipo_gracia === "TOTAL" ? "Total" : "Parcial" : "Sin Gracia"} ({selectedPlan.meses_gracia} meses)</p>
                             </div>
                         </div>
 

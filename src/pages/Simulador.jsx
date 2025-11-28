@@ -14,12 +14,11 @@ import { formatMoney } from "../utils/format";
 export default function Simulador() {
   const navigate = useNavigate();
 
-  // IDs desde Store
   const { entidadFinancieraId: entidadFinancieraIdUrl, localId: localIdUrl } = useSimulationStore();
   const user = useAuthStore((state) => state.user);
 
   // Estados de datos
-  const [entidadFinanciera, setEntidadFinanciera] = useState(null); // Iniciar en null para validar carga
+  const [entidadFinanciera, setEntidadFinanciera] = useState(null);
   const [local, setLocal] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -57,10 +56,8 @@ export default function Simulador() {
         // Pre-llenar formulario con valores por defecto de la entidad
         setForm(prev => ({
           ...prev,
-          //Si el banco trae datos, úsalos como default.
           tipo_tasa: entidadData.tipo_tasa || "EFECTIVA",
           capitalizacion: entidadData.capitalizacion || "mensual",
-          //Convertimos a porcentaje visual (ej: 0.10 -> 10)
           tasa_interes_anual: entidadData.tasa_interes ? entidadData.tasa_interes * 100 : ""
         }));
 
@@ -113,11 +110,8 @@ export default function Simulador() {
 
       const resp = await crearPlanPago(payload);
 
-      // Si todo sale bien, navegar
       navigate("/resultado", { state: resp.data });
-
     } catch (err) {
-      // Manejar el error que viene del backend (ej: "No califica al bono")
       const msg = err.response?.data?.message || err.message || "Error al realizar la simulación";
       setError(msg);
     } finally {
@@ -125,13 +119,37 @@ export default function Simulador() {
     }
   };
 
-  // Render condicional de carga
   if (!entidadFinanciera || !local) return <div className="p-4">Cargando datos del simulador...</div>;
 
   const monedaSymbol = local.moneda === 'USD' ? '$' : 'S/';
-  const monedaLocal = local.moneda; // 'USD'
-  const monedaBanco = entidadFinanciera.moneda; // 'PEN'
+  const monedaLocal = local.moneda;
+  const monedaBanco = entidadFinanciera.moneda;
   const necesitaConversion = monedaLocal !== monedaBanco;
+
+  const getStepGracia = (frecuencia) => {
+    switch (frecuencia) {
+      case "mensual": return 1;
+      case "bimestral": return 2;
+      case "trimestral": return 3;
+      case "cuatrimestral": return 4;
+      case "semestral": return 6;
+      case "anual": return 12;
+      default: return 1;
+    }
+  };
+
+  const stepGracia = getStepGracia(form.frecuencia_pago);
+
+  const handleBlurGracia = () => {
+    const valorActual = Number(form.periodo_gracia_meses);
+
+    // Si no es múltiplo exacto, lo forzamos al más cercano
+    if (valorActual % stepGracia !== 0) {
+      const valorCorregido = Math.floor(valorActual / stepGracia) * stepGracia;
+
+      setForm({ ...form, periodo_gracia_meses: valorCorregido });
+    }
+  };
 
   return (
     <Card>
@@ -295,19 +313,36 @@ export default function Simulador() {
                 )}
               </Select>
 
-              <Input
-                label={`Meses de Gracia (Máx: ${entidadFinanciera.max_meses_gracia})`}
-                type="number"
-                name="periodo_gracia_meses"
-                value={form.periodo_gracia_meses}
-                onChange={(e) => {
-                  const val = Number(e.target.value);
-                  if (val <= entidadFinanciera.max_meses_gracia) {
-                    setForm({ ...form, periodo_gracia_meses: e.target.value });
-                  }
-                }}
-                disabled={form.periodo_gracia_tipo === "SIN_GRACIA"}
-              />
+              <div>
+                <Input
+                  label={`Meses de Gracia (Máx: ${entidadFinanciera.max_meses_gracia})`}
+                  type="number"
+                  name="periodo_gracia_meses"
+                  value={form.periodo_gracia_meses}
+                  step={stepGracia}
+                  min={0}
+                  max={entidadFinanciera.max_meses_gracia}
+                  onChange={(e) => {
+                    const val = Number(e.target.value);
+                    if (val <= entidadFinanciera.max_meses_gracia) {
+                      setForm({ ...form, periodo_gracia_meses: e.target.value });
+                    }
+                  }}
+                  onBlur={handleBlurGracia}
+                  disabled={form.periodo_gracia_tipo === "SIN_GRACIA"}
+                />
+
+                {/* FEEDBACK VISUAL */}
+                {Number(form.periodo_gracia_meses) % stepGracia !== 0 && (
+                  <p className="text-xs text-orange-600 mt-1 font-semibold">
+                    ⚠️ Ajustando a múltiplo de {stepGracia} meses...
+                  </p>
+                )}
+
+                <p className="text-[10px] text-gray-500 mt-1">
+                  * Pagos {form.frecuencia_pago}: gracia debe ser cada {stepGracia} meses.
+                </p>
+              </div>
             </div>
           )}
         </div>
