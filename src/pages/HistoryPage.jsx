@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import Modal from "../components/ui/Modal";
+import Profile from "../components/ui/Profile";
 import { getAllPlanPagosByUserId, deletePlanPago } from "../api/planPago.api";
 import { useAuthStore } from "../store/useAuthStore";
 
@@ -59,7 +60,10 @@ export default function HistoryPage() {
 
     return (
         <div className="p-6 space-y-6">
-            <h1 className="text-2xl font-bold text-gray-800">Historial de Simulaciones</h1>
+            <div className="flex justify-between items-center">
+                <h1 className="text-2xl font-bold text-gray-800">Historial de Simulaciones</h1>
+                <Profile />
+            </div>
 
             {planPagos.length === 0 ? (
                 <Card className="text-center p-8">

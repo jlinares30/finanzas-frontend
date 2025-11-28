@@ -1,50 +1,67 @@
-import { useEffect, useState } from "react";
-import { getEntidades } from "../api/entidadFinanciera.api";
-import Card from "../components/ui/Card";
-import Button from "../components/ui/Button";
-import Profile from "../components/ui/Profile";
 import { useNavigate } from "react-router-dom";
-
 import { useAuthStore } from "../store/useAuthStore";
+import Card from "../components/ui/Card";
+import Profile from "../components/ui/Profile";
 
 export default function Home() {
   const navigate = useNavigate();
-  const logout = useAuthStore((state) => state.logout);
-  const [entidades, setEntidades] = useState([]);
+  const { user } = useAuthStore();
 
-  useEffect(() => {
-    getEntidades().then(r => setEntidades(r.data));
-  }, []);
-
-  console.log(entidades);
-
-  const seleccionar = (id) => {
-    navigate(`/entidad/${id}/locales`);
-  };
+  const quickActions = [
+    {
+      title: "Nueva Simulación",
+      description: "Explora locales y simula tu crédito hipotecario.",
+      icon: "🏠",
+      path: "/locales",
+      color: "bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200",
+    },
+    {
+      title: "Historial",
+      description: "Revisa tus simulaciones y planes de pago guardados.",
+      icon: "📜",
+      path: "/history",
+      color: "bg-green-50 text-green-700 hover:bg-green-100 border-green-200",
+    },
+    {
+      title: "Mi Perfil",
+      description: "Actualiza tus datos personales y socioeconómicos.",
+      icon: "👤",
+      path: "/profile",
+      color: "bg-purple-50 text-purple-700 hover:bg-purple-100 border-purple-200",
+    },
+  ];
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">Selecciona una Entidad Financiera</h2>
+    <div className="p-6 min-h-screen bg-gray-50">
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800">Hola, {user?.name || "Usuario"} 👋</h1>
+          <p className="text-gray-600">Bienvenido a tu panel financiero.</p>
+        </div>
         <Profile />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {entidades.map((e) => (
-          <Card key={e.id}>
-            <h3 className="text-lg font-semibold">{e.nombre}</h3>
-            <p className="text-sm">Tasa: {e.tasa_interes * 100}% {e.tipo_tasa == "EFECTIVA" ? e.frecuencia_efectiva : e.frecuencia_nominal}</p>
-            <p className="text-sm">Tipo de Tasa: {e.tipo_tasa}</p>
-            <p className="text-sm">Moneda: {e.moneda}</p>
-            {e.capitalizacion && <p className="text-sm">Capitalización: {e.capitalizacion}</p>}
-            <p className="text-sm">Periodo de Gracia: {e.periodos_gracia_permitidos !== "SIN_GRACIA" ? "Aplica" : "No Aplica"}</p>
-            {e.periodos_gracia_permitidos !== "SIN_GRACIA" && <p className="text-sm">Gracia: Hasta {e.max_meses_gracia} meses</p>}
-            {e.periodos_gracia_permitidos !== "SIN_GRACIA" && <p className="text-sm">({e.periodos_gracia_permitidos})</p>}
-            <p className="text-sm">Bono Techo Propio: {e.aplica_bono_techo_propio === true ? "Aplica" : "No Aplica"}</p>
-            <Button className="mt-3 bg-green-600 hover:bg-green-700" onClick={() => seleccionar(e.id)}  >
-              Elegir
-            </Button>
-          </Card>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {quickActions.map((action) => (
+          <div
+            key={action.title}
+            onClick={() => navigate(action.path)}
+            className={`cursor-pointer p-6 rounded-xl border transition-all shadow-sm hover:shadow-md ${action.color}`}
+          >
+            <div className="text-4xl mb-4">{action.icon}</div>
+            <h3 className="text-lg font-bold mb-2">{action.title}</h3>
+            <p className="text-sm opacity-90">{action.description}</p>
+          </div>
         ))}
+      </div>
+
+      <div className="mt-10">
+        <h2 className="text-xl font-bold text-gray-800 mb-4">Resumen</h2>
+        <Card className="bg-white">
+          <div className="p-4 text-center text-gray-500">
+            <p>Aquí verás un resumen de tus actividades recientes pronto.</p>
+          </div>
+        </Card>
       </div>
     </div>
   );

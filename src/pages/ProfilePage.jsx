@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Card from "../components/ui/Card";
 import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
+import Profile from "../components/ui/Profile";
 import { getProfile, updateProfile, updateSocioeconomico } from "../api/auth.api";
 import { useAuthStore } from "../store/useAuthStore";
 
@@ -97,11 +98,7 @@ export default function ProfilePage() {
             <Card className="w-full max-w-2xl">
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-2xl font-bold">Mi Perfil</h2>
-                    {!isEditing && (
-                        <Button onClick={() => setIsEditing(true)}>
-                            Editar Perfil
-                        </Button>
-                    )}
+                    <Profile />
                 </div>
 
                 <div className="flex flex-col items-center mb-8">
@@ -166,6 +163,14 @@ export default function ProfilePage() {
                         </div>
                     </div>
                 </div>
+
+                {!isEditing && (
+                    <div className="mt-6 flex justify-end gap-2">
+                        <Button onClick={() => setIsEditing(true)}>
+                            Editar Perfil
+                        </Button>
+                    </div>
+                )}
 
                 {isEditing && (
                     <div className="mt-6 flex justify-end gap-2">
