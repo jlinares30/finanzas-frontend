@@ -21,7 +21,8 @@ export default function Simulador() {
   const [entidadFinanciera, setEntidadFinanciera] = useState(null); // Iniciar en null para validar carga
   const [local, setLocal] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null); // Para mostrar errores del backend
+  const [error, setError] = useState(null);
+  const [tipoCambio, setTipoCambio] = useState(3.5);
 
   // Estado del Formulario
   const [form, setForm] = useState({
@@ -31,6 +32,7 @@ export default function Simulador() {
     frecuencia_pago: "mensual",
     periodo_gracia_tipo: "SIN_GRACIA",
     periodo_gracia_meses: 0,
+    cok: "",
 
     // Datos de Tasa
     tipo_tasa: "EFECTIVA",
@@ -96,10 +98,10 @@ export default function Simulador() {
         bono_aplicable: form.bono_aplicable,
         num_anios: Number(form.num_anios),
         frecuencia_pago: form.frecuencia_pago,
-
+        tipo_cambio: Number(tipoCambio),
         tipo_tasa: form.tipo_tasa,
         tasa_interes_anual: Number(form.tasa_interes_anual) / 100,
-
+        cok: form.cok ? Number(form.cok) / 100 : 0,
         capitalizacion: form.tipo_tasa === 'NOMINAL' ? form.capitalizacion : null,
 
         periodo_gracia: {
@@ -126,6 +128,9 @@ export default function Simulador() {
   if (!entidadFinanciera || !local) return <div className="p-4">Cargando datos del simulador...</div>;
 
   const monedaSymbol = local.moneda === 'USD' ? '$' : 'S/';
+  const monedaLocal = local.moneda; // 'USD'
+  const monedaBanco = entidadFinanciera.moneda; // 'PEN'
+  const necesitaConversion = monedaLocal !== monedaBanco;
 
   return (
     <Card>
@@ -171,6 +176,10 @@ export default function Simulador() {
             onChange={update}
           >
             <option value="mensual">Mensual</option>
+            <option value="bimestral">Bimestral</option>
+            <option value="trimestral">Trimestral</option>
+            <option value="cuatrimestral">Cuatrimestral</option>
+            <option value="semestral">Semestral</option>
             <option value="anual">Anual</option>
           </Select>
 
@@ -216,10 +225,12 @@ export default function Simulador() {
                   className="w-full p-2 border rounded"
                 >
                   <option value="diaria">Diaria</option>
-                  <option value="quincenal">Quincenal</option>
                   <option value="mensual">Mensual</option>
                   <option value="bimestral">Bimestral</option>
+                  <option value="trimestral">Trimestral</option>
+                  <option value="cuatrimestral">Cuatrimestral</option>
                   <option value="semestral">Semestral</option>
+                  <option value="anual">Anual</option>
                 </select>
               </div>
             ) : (
@@ -299,7 +310,51 @@ export default function Simulador() {
             </div>
           )}
         </div>
+        <div className="border-t pt-4 mt-4">
+          <h3 className="text-sm font-bold text-gray-700 mb-2">Evaluación Financiera (Opcional)</h3>
+          <Input
+            label="COK (Costo de Oportunidad) - Anual %"
+            name="cok"
+            type="number"
+            step="0.01"
+            placeholder="Ej. 10 (Si tienes otra inversión)"
+            value={form.cok}
+            onChange={update}
+            helperText="Tasa de descuento para calcular el VAN."
+          />
+        </div>
 
+        {/* AVISO DE CONVERSIÓN DE MONEDA */}
+        {necesitaConversion && (
+          <div className="bg-yellow-50 border border-yellow-200 p-3 rounded-md mb-4 text-sm">
+            <h4 className="font-bold text-yellow-800 flex items-center gap-2">
+              Conversión de Moneda Requerida
+            </h4>
+            <p className="text-yellow-700 mt-1">
+              El inmueble está en <strong>{monedaLocal}</strong> pero el crédito será en <strong>{monedaBanco}</strong>.
+            </p>
+
+            <div className="mt-3 grid grid-cols-2 gap-4 items-center">
+              <Input
+                label="Tipo de Cambio (Referencial)"
+                type="number"
+                step="0.01"
+                value={tipoCambio}
+                onChange={(e) => setTipoCambio(e.target.value)}
+              />
+              <div className="text-right">
+                <p className="text-xs text-gray-500">Precio convertido:</p>
+                <p className="font-bold text-lg text-gray-800">
+                  {monedaBanco === 'PEN' ? 'S/' : '$'}
+                  {monedaBanco === 'PEN'
+                    ? (local.precio * tipoCambio).toLocaleString('es-PE', { minimumFractionDigits: 2 })
+                    : (local.precio / tipoCambio).toLocaleString('es-PE', { minimumFractionDigits: 2 })
+                  }
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
         <Button onClick={simulate} disabled={loading}>
           {loading ? "Calculando..." : "Generar Plan de Pagos"}
         </Button>

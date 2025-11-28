@@ -1,72 +1,3 @@
-// import { useLocation, Link } from "react-router-dom";
-// import Card from "../components/ui/Card";
-// import Button from "../components/ui/Button";
-
-// export default function Resultado() {
-//   const { state } = useLocation();
-//   const { message, plan, cuotas, indicadores, flujoInicial } = state;
-
-//   return (
-//     <div className="flex flex-col gap-6">
-
-//       <Card>
-//         <h2 className="text-xl font-bold mb-2">Resultado</h2>
-//         <p className="text-sm mb-3">{message}</p>
-
-//         <h3 className="font-semibold mt-4">Plan General</h3>
-//         <pre className="bg-gray-200 p-3 rounded text-xs overflow-auto">
-//           {JSON.stringify(plan, null, 2)}
-//         </pre>
-
-//         <h3 className="font-semibold mt-4">Indicadores Financieros</h3>
-//         <pre className="bg-gray-200 p-3 rounded text-xs overflow-auto">
-//           {JSON.stringify(indicadores, null, 2)}
-//         </pre>
-
-//         <h3 className="font-semibold mt-4">Flujo inicial</h3>
-//         <p className="text-sm">{flujoInicial}</p>
-
-//         <Link to="/simulador">
-//           <Button className="mt-4">Nueva Simulación</Button>
-//         </Link>
-//       </Card>
-
-//       <Card>
-//         <h3 className="text-lg font-bold mb-2">Cuotas</h3>
-
-//         <div className="overflow-auto max-h-[600px] text-xs">
-//           <table className="min-w-full border">
-//             <thead className="bg-gray-100 text-left">
-//               <tr>
-//                 <th className="border p-1">#</th>
-//                 <th className="border p-1">Saldo Inicial</th>
-//                 <th className="border p-1">Interés</th>
-//                 <th className="border p-1">Cuota</th>
-//                 <th className="border p-1">Amortización</th>
-//                 <th className="border p-1">Saldo Final</th>
-//               </tr>
-//             </thead>
-//             <tbody>
-//               {cuotas?.map((c) => (
-//                 <tr key={c.numero}>
-//                   <td className="border p-1">{c.numero}</td>
-//                   <td className="border p-1">{c.saldo_inicial}</td>
-//                   <td className="border p-1">{c.interes}</td>
-//                   <td className="border p-1">{c.cuota}</td>
-//                   <td className="border p-1">{c.amortizacion}</td>
-//                   <td className="border p-1">{c.saldo_final}</td>
-//                 </tr>
-//               ))}
-//             </tbody>
-//           </table>
-//         </div>
-//       </Card>
-
-//     </div>
-//   );
-// }
-
-
 import { useLocation, Link } from "react-router-dom";
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
@@ -74,113 +5,41 @@ import Button from "../components/ui/Button";
 export default function Resultado() {
   const { state } = useLocation();
 
-  if (!state) return <div className="p-4">No hay resultados para mostrar.</div>;
+  if (!state) return <div className="p-8 text-center text-gray-500">No hay resultados para mostrar. Inicia una nueva simulación.</div>;
 
   const { plan, cuotas, indicadores, flujoInicial } = state;
 
-  // Helper para formatear dinero según la moneda del plan
+  // Helpers de formato
+  const currency = plan.moneda || "PEN";
+
+  console.log(indicadores);
+
   const formatMoney = (amount) => {
     return new Intl.NumberFormat("es-PE", {
       style: "currency",
-      currency: plan.moneda || "PEN",
+      currency: currency,
       minimumFractionDigits: 2,
     }).format(amount);
   };
 
-  // Helper para porcentajes
   const formatPercent = (val) => {
     return val ? `${(Number(val) * 100).toFixed(2)}%` : "-";
   };
 
   return (
-    <div className="p-4 max-w-5xl mx-auto">
+    <div className="p-4 max-w-6xl mx-auto flex flex-col gap-6 font-sans text-gray-800">
 
-      {/* ENCABEZADO Y RESUMEN DEL CRÉDITO */}
-      <div className="flex flex-col gap-6">
-        <div className="flex justify-between items-center mb-4 border-b pb-2">
-          <h2 className="text-2xl font-bold text-gray-800">Resumen de Simulación</h2>
-          <span className="bg-blue-100 text-blue-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">
-            {plan.moneda === 'USD' ? 'Dólares Americanos' : 'Soles'}
-          </span>
+      {/* 1. ENCABEZADO Y ACCIONES */}
+      <div className="flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+        <div className="mb-4 sm:mb-0">
+          <h1 className="text-2xl font-bold text-gray-900">Resultado de la Simulación</h1>
+          <p className="text-sm text-gray-500 mt-1">
+            Calculado el {new Date(plan.createdAt || Date.now()).toLocaleDateString()}
+          </p>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
-          {/* Columna 1: Valores del Inmueble */}
-          <div>
-            <h3 className="font-semibold text-gray-500 mb-2">Datos del Inmueble</h3>
-            <div className="flex justify-between py-1 border-b">
-              <span>Precio Venta:</span>
-              <span className="font-medium">{formatMoney(plan.precio_venta)}</span>
-            </div>
-            <div className="flex justify-between py-1 border-b">
-              <span>Cuota Inicial:</span>
-              <span className="font-medium text-red-600">-{formatMoney(plan.cuota_inicial)}</span>
-            </div>
-            <div className="flex justify-between py-1 border-b bg-green-50">
-              <span>Bono Techo Propio:</span>
-              <span className="font-bold text-green-700">
-                {Number(plan.bono_aplicable) > 0 ? `-${formatMoney(plan.bono_aplicable)}` : "No aplica"}
-              </span>
-            </div>
-            <div className="flex justify-between py-1 mt-2 text-lg font-bold text-blue-900">
-              <span>Monto a Financiar:</span>
-              <span>{formatMoney(plan.monto_prestamo)}</span>
-            </div>
-          </div>
-
-          {/* Columna 2: Condiciones del Préstamo */}
-          <div>
-            <h3 className="font-semibold text-gray-500 mb-2">Condiciones</h3>
-            <div className="flex justify-between py-1 border-b">
-              <span>Plazo:</span>
-              <span className="font-medium">{plan.num_anios} años ({plan.total_cuotas} cuotas)</span>
-            </div>
-            <div className="flex justify-between py-1 border-b">
-              <span>Frecuencia:</span>
-              <span className="font-medium capitalize">{plan.frecuencia_pago}</span>
-            </div>
-            <div className="flex justify-between py-1 border-b">
-              <span>Tipo de Gracia:</span>
-              <span className="font-medium capitalize">{plan.tipo_gracia}</span>
-            </div>
-            {plan.meses_gracia > 0 && (
-              <div className="flex justify-between py-1 border-b">
-                <span>Meses de Gracia:</span>
-                <span className="font-medium">{plan.meses_gracia} meses</span>
-              </div>
-            )}
-          </div>
-
-          {/* Columna 3: Indicadores Financieros (TCEA/VAN/TIR) */}
-          <div className="bg-gray-50 p-4 rounded-lg border">
-            <h3 className="font-bold text-gray-700 mb-2 text-center">Indicadores de Rentabilidad</h3>
-
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-gray-600">TCEA (Costo Real):</span>
-              <span className="text-xl font-bold text-purple-700">{formatPercent(indicadores.tcea)}</span>
-            </div>
-
-            <div className="flex justify-between items-center text-xs text-gray-500 mb-1">
-              <span>TIR (Tasa Interna):</span>
-              <span>{formatPercent(indicadores.tir)}</span>
-            </div>
-            <div className="flex justify-between items-center text-xs text-gray-500 mb-1">
-              <span>VAN (Valor Actual):</span>
-              <span>{formatMoney(indicadores.van)}</span>
-            </div>
-
-            <div className="mt-3 pt-3 border-t border-gray-200 text-xs">
-              <div className="flex justify-between">
-                <span>Desembolso Neto (Cliente):</span>
-                <span className="font-bold">{formatMoney(flujoInicial)}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-6 flex justify-between">
+        <div className="flex gap-3">
           <Link to="/">
-            <Button>Elegir Otra Entidad Financiera</Button>
+            <Button variant="outline">Inicio</Button>
           </Link>
           <Link to="/simulador">
             <Button>Nueva Simulación</Button>
@@ -188,42 +47,143 @@ export default function Resultado() {
         </div>
       </div>
 
-      {/* 2. TABLA DETALLADA DE PAGOS */}
-      <div className="flex flex-col gap-6 max-w-5xl mx-auto p-4">
-        <h3 className="text-lg font-bold mb-4 text-gray-800">Cronograma de Pagos Detallado</h3>
+      {/* 2. TARJETAS DE RESUMEN */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-        <div className="overflow-x-auto max-h-[600px] shadow-inner border rounded-lg">
-          <table className="min-w-full text-xs text-right divide-y divide-gray-200">
-            <thead className="bg-gray-100 text-gray-600 sticky top-0 font-bold uppercase tracking-wider">
+        {/* COLUMNA 1: EL INMUEBLE */}
+        <Card className="h-full flex flex-col justify-between">
+          <div>
+            <h3 className="font-bold text-gray-700 border-b pb-2 mb-3">1. El Inmueble</h3>
+            <div className="space-y-3 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Precio Venta:</span>
+                <span className="font-medium">{formatMoney(plan.precio_venta)}</span>
+              </div>
+
+              {/* Conversión de Moneda */}
+              {plan.tipo_cambio_usado !== 1 && (
+                <div className="bg-blue-50 p-2 rounded text-xs text-blue-700 border border-blue-100">
+                  * Convertido con T.C. {Number(plan.tipo_cambio_usado).toFixed(3)}
+                </div>
+              )}
+
+              <div className="flex justify-between text-red-600">
+                <span>Cuota Inicial:</span>
+                <span>- {formatMoney(plan.cuota_inicial)}</span>
+              </div>
+
+              <div className="flex justify-between text-green-600">
+                <span>Bono Techo Propio:</span>
+                <span>
+                  {Number(plan.bono_aplicable) > 0 ? `- ${formatMoney(plan.bono_aplicable)}` : "No aplica"}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="border-t pt-3 mt-3 flex justify-between font-bold text-lg text-blue-900 bg-blue-50 -mx-4 -mb-4 p-4 rounded-b-lg">
+            <span>A Financiar:</span>
+            <span>{formatMoney(plan.monto_prestamo)}</span>
+          </div>
+        </Card>
+
+        {/* COLUMNA 2: EL CRÉDITO */}
+        <Card className="h-full">
+          <h3 className="font-bold text-gray-700 border-b pb-2 mb-3">2. Condiciones del Banco</h3>
+          <div className="space-y-3 text-sm">
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600">Tasa Interés (TEA):</span>
+              <span className="font-bold bg-gray-100 px-2 py-1 rounded">{formatPercent(indicadores.TEA)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Plazo Total:</span>
+              <span className="font-medium">{plan.num_anios} años ({plan.total_cuotas} cuotas)</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Frecuencia Pago:</span>
+              <span className="capitalize font-medium">{plan.frecuencia_pago}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Periodo de Gracia:</span>
+              <span className="capitalize font-medium">{plan.tipo_gracia ? plan.tipo_gracia.replace('_', ' ') : 'Sin Gracia'}</span>
+            </div>
+            {plan.meses_gracia > 0 && (
+              <div className="flex justify-between bg-orange-50 p-2 rounded text-orange-800 text-xs border border-orange-100">
+                <span>Duración Gracia:</span>
+                <span className="font-bold">{plan.meses_gracia} meses</span>
+              </div>
+            )}
+          </div>
+        </Card>
+
+        {/* COLUMNA 3: INDICADORES */}
+        <Card className="h-full border-l-4 border-l-purple-600 bg-gradient-to-br from-white to-purple-50">
+          <h3 className="font-bold text-purple-800 border-b border-purple-100 pb-2 mb-3">3. Rentabilidad y Costo</h3>
+
+          <div className="flex justify-between items-end mb-4">
+            <span className="text-gray-600 text-sm font-medium">TCEA (Costo Real):</span>
+            <span className="text-3xl font-bold text-purple-700">{formatPercent(indicadores.tcea)}</span>
+          </div>
+
+          <div className="space-y-2 text-xs text-gray-600 bg-white p-3 rounded border border-purple-100 shadow-sm">
+            <div className="flex justify-between">
+              <span>Total Intereses a Pagar:</span>
+              <span className="font-semibold text-gray-800">{formatMoney(plan.total_intereses)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>VAN (Valor Actual Neto):</span>
+              <span className={`font-semibold ${indicadores.van < 0 ? 'text-red-500' : 'text-green-600'}`}>
+                {formatMoney(indicadores.van)}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span>Tasa Descuento (COK):</span>
+              <span>{formatPercent(plan.cok)}</span>
+            </div>
+            <div className="flex justify-between border-t border-gray-200 pt-2 mt-2">
+              <span className="font-medium">Desembolso Neto:</span>
+              <span className="font-bold text-gray-800">{formatMoney(flujoInicial)}</span>
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      {/* 3. TABLA DE PAGOS */}
+      <Card className="overflow-hidden border-0 shadow-lg">
+        <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+          <h3 className="font-bold text-gray-800">Cronograma de Pagos</h3>
+        </div>
+
+        <div className="overflow-x-auto max-h-[500px]">
+          <table className="w-full text-xs text-right border-collapse">
+            <thead className="bg-gray-100 text-gray-600 font-bold uppercase sticky top-0 z-10 shadow-sm">
               <tr>
-                <th className="p-3 text-center">#</th>
-                <th className="p-3">Saldo Inicial</th>
-                <th className="p-3">Amortización</th>
-                <th className="p-3">Interés</th>
-                <th className="p-3 bg-yellow-50">Seg. Desgrav</th>
-                <th className="p-3 bg-yellow-50">Seg. Riesgo</th>
-                <th className="p-3 bg-yellow-50">Gastos/Comis.</th>
-                <th className="p-3 bg-blue-50 text-blue-800 font-bold border-l border-blue-100">Cuota Total</th>
-                <th className="p-3">Saldo Final</th>
+                <th className="p-3 text-center border-b">#</th>
+                <th className="p-3 border-b">Saldo Inicial</th>
+                <th className="p-3 border-b">Amortización</th>
+                <th className="p-3 border-b">Interés</th>
+                <th className="p-3 bg-yellow-50 border-b text-yellow-800">Seg. Desg.</th>
+                <th className="p-3 bg-yellow-50 border-b text-yellow-800">Seg. Riesgo</th>
+                <th className="p-3 bg-yellow-50 border-b text-yellow-800">Gastos</th>
+                <th className="p-3 bg-blue-50 border-b text-blue-900 border-l border-blue-100">Cuota Total</th>
+                <th className="p-3 border-b">Saldo Final</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-100">
+            <tbody className="divide-y divide-gray-100 bg-white">
               {cuotas?.map((c) => (
                 <tr key={c.numero} className="hover:bg-gray-50 transition-colors">
-                  <td className="p-3 text-center font-medium text-gray-500">{c.numero}</td>
-                  <td className="p-3">{formatMoney(c.saldo_inicial)}</td>
-                  <td className="p-3 font-semibold text-green-600">{formatMoney(c.amortizacion)}</td>
-                  <td className="p-3 text-red-600">{formatMoney(c.interes)}</td>
+                  <td className="p-3 text-center text-gray-400 font-medium">{c.numero}</td>
+                  <td className="p-3 text-gray-600">{formatMoney(c.saldo_inicial)}</td>
+                  <td className="p-3 font-medium text-green-600">{formatMoney(c.amortizacion)}</td>
+                  <td className="p-3 text-red-500">{formatMoney(c.interes)}</td>
 
-                  {/* Costos Adicionales (Importante para Transparencia) */}
-                  <td className="p-3 bg-yellow-50 text-gray-600">{formatMoney(c.seguro_desgravamen)}</td>
-                  <td className="p-3 bg-yellow-50 text-gray-600">{formatMoney(c.seguro_riesgo)}</td>
-                  <td className="p-3 bg-yellow-50 text-gray-600">
+                  <td className="p-3 bg-yellow-50/30 text-gray-500">{formatMoney(c.seguro_desgravamen)}</td>
+                  <td className="p-3 bg-yellow-50/30 text-gray-500">{formatMoney(c.seguro_riesgo)}</td>
+                  <td className="p-3 bg-yellow-50/30 text-gray-500">
                     {formatMoney(Number(c.comision) + Number(c.portes) + Number(c.gastos_administrativos))}
                   </td>
 
-                  <td className="p-3 bg-blue-50 text-blue-800 font-bold border-l border-blue-100">
-                    {formatMoney(Math.abs(c.flujo))} {/* Usamos el flujo negativo absoluto como cuota total a pagar */}
+                  <td className="p-3 bg-blue-50 font-bold text-blue-800 border-l border-blue-100">
+                    {formatMoney(Math.abs(c.flujo))}
                   </td>
 
                   <td className="p-3 text-gray-400">{formatMoney(c.saldo_final)}</td>
@@ -232,7 +192,7 @@ export default function Resultado() {
             </tbody>
           </table>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }
