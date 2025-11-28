@@ -5,6 +5,7 @@ import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
 import { getLocalById, updateLocal } from "../api/locales.api";
 import { useSimulationStore } from "../store/useSimulationStore";
+import { formatMoney } from "../utils/format";
 
 export default function DetalleLocal() {
   const { localId, entidadId } = useParams();
@@ -37,8 +38,7 @@ export default function DetalleLocal() {
 
   const seleccionarLocal = () => {
     if (!local) return;
-    // No need to set simulation data here yet, or maybe we can set localId
-    // setSimulationData(null, local.id); 
+
     navigate(`/local/${local.id}/entidades`);
   };
 
@@ -77,7 +77,7 @@ export default function DetalleLocal() {
         <h2 className="text-lg font-bold">🏢 Local seleccionado</h2>
         <p>Nombre: {local.nombre}</p>
         <p>Dirección: {local.direccion}</p>
-        <p>Precio: {local.precio} ({local.moneda})</p>
+        <p>Precio: {formatMoney(local.precio, local.moneda)}</p>
         <p>Tipo: {local.tipo}</p>
       </Card>
 
@@ -97,12 +97,12 @@ export default function DetalleLocal() {
             </div>
           ) : (
             <>
-              <p>Notariales: {costoInicial.costes_notariales}</p>
-              {costoInicial.seguro_riesgo && <p>Seguro de riesgo: {costoInicial.seguro_riesgo}</p>}
-              <p>Registrales: {costoInicial.costes_registrales}</p>
-              <p>Tasación: {costoInicial.tasacion}</p>
-              <p>Comisión estudio: {costoInicial.comision_estudio}</p>
-              <p>Comisión activación: {costoInicial.comision_activacion}</p>
+              <p>Notariales: {formatMoney(costoInicial.costes_notariales, local.moneda)}</p>
+              {costoInicial.seguro_riesgo && <p>Seguro de riesgo: {formatMoney(costoInicial.seguro_riesgo, local.moneda)}</p>}
+              <p>Registrales: {formatMoney(costoInicial.costes_registrales, local.moneda)}</p>
+              <p>Tasación: {formatMoney(costoInicial.tasacion, local.moneda)}</p>
+              <p>Comisión estudio: {formatMoney(costoInicial.comision_estudio, local.moneda)}</p>
+              <p>Comisión activación: {formatMoney(costoInicial.comision_activacion, local.moneda)}</p>
             </>
           )}
         </Card>
@@ -122,10 +122,10 @@ export default function DetalleLocal() {
             </div>
           ) : (
             <>
-              {costoPeriodico.seguro_contra_todo_riesgo && <p>Seguro todo riesgo: {costoPeriodico.seguro_contra_todo_riesgo}</p>}
-              <p>Comisión periódica: {costoPeriodico.comision_periodica}</p>
-              <p>Portes: {costoPeriodico.portes}</p>
-              <p>Gastos administrativos: {costoPeriodico.gastos_administrativos}</p>
+              {costoPeriodico.seguro_contra_todo_riesgo && <p>Seguro todo riesgo: {formatMoney(costoPeriodico.seguro_contra_todo_riesgo, local.moneda)}</p>}
+              <p>Comisión periódica: {formatMoney(costoPeriodico.comision_periodica, local.moneda)}</p>
+              <p>Portes: {formatMoney(costoPeriodico.portes, local.moneda)}</p>
+              <p>Gastos administrativos: {formatMoney(costoPeriodico.gastos_administrativos, local.moneda)}</p>
             </>
           )}
         </Card>

@@ -6,6 +6,7 @@ import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import Profile from "../components/ui/Profile";
 import { useSimulationStore } from "../store/useSimulationStore";
+import { formatPercent } from "../utils/format";
 
 export default function EntidadList() {
     const { localId } = useParams();
@@ -73,7 +74,7 @@ export default function EntidadList() {
                             <p className="text-sm text-gray-600 mb-2">{entidad.descripcion}</p>
 
                             <div className="text-sm space-y-1">
-                                <p className="text-sm">Tasa: {entidad.tasa_interes * 100}% {entidad.tipo_tasa == "EFECTIVA" ? entidad.frecuencia_efectiva : entidad.frecuencia_nominal}</p>
+                                <p className="text-sm">Tasa: {formatPercent(entidad.tasa_interes)} {entidad.tipo_tasa == "EFECTIVA" ? entidad.frecuencia_efectiva : entidad.frecuencia_nominal}</p>
                                 <p className="text-sm">Tipo de Tasa: {entidad.tipo_tasa}</p>
                                 <p className="text-sm">Moneda: {entidad.moneda}</p>
                                 {entidad.capitalizacion && <p className="text-sm">Capitalización: {entidad.capitalizacion}</p>}

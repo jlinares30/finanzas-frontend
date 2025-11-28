@@ -5,6 +5,7 @@ import Button from "../components/ui/Button";
 import Profile from "../components/ui/Profile";
 import { getProfile, updateProfile, updateSocioeconomico } from "../api/auth.api";
 import { useAuthStore } from "../store/useAuthStore";
+import { formatMoney } from "../utils/format";
 
 export default function ProfilePage() {
     const { user: authUser, login } = useAuthStore();
@@ -155,7 +156,7 @@ export default function ProfilePage() {
                             ) : (
                                 <>
                                     <div><span className="text-sm text-gray-500 block">Ocupación</span> <span className="font-medium">{socioData.ocupacion || "-"}</span></div>
-                                    <div><span className="text-sm text-gray-500 block">Ingresos Mensuales</span> <span className="font-medium">S/ {socioData.ingresos_mensuales || "0.00"}</span></div>
+                                    <div><span className="text-sm text-gray-500 block">Ingresos Mensuales</span> <span className="font-medium">{formatMoney(socioData.ingresos_mensuales)}</span></div>
                                     <div><span className="text-sm text-gray-500 block">Tipo Contrato</span> <span className="font-medium">{socioData.tipo_contrato || "-"}</span></div>
                                     <div><span className="text-sm text-gray-500 block">Nivel Educativo</span> <span className="font-medium">{socioData.nivel_educativo || "-"}</span></div>
                                 </>

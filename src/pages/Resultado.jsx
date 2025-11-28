@@ -1,6 +1,7 @@
 import { useLocation, Link } from "react-router-dom";
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
+import { formatMoney, formatPercent } from "../utils/format";
 
 export default function Resultado() {
   const { state } = useLocation();
@@ -13,18 +14,6 @@ export default function Resultado() {
   const currency = plan.moneda || "PEN";
 
   console.log(indicadores);
-
-  const formatMoney = (amount) => {
-    return new Intl.NumberFormat("es-PE", {
-      style: "currency",
-      currency: currency,
-      minimumFractionDigits: 2,
-    }).format(amount);
-  };
-
-  const formatPercent = (val) => {
-    return val ? `${(Number(val) * 100).toFixed(2)}%` : "-";
-  };
 
   return (
     <div className="p-4 max-w-6xl mx-auto flex flex-col gap-6 font-sans text-gray-800">
@@ -57,7 +46,7 @@ export default function Resultado() {
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-600">Precio Venta:</span>
-                <span className="font-medium">{formatMoney(plan.precio_venta)}</span>
+                <span className="font-medium">{formatMoney(plan.precio_venta, currency)}</span>
               </div>
 
               {/* Conversión de Moneda */}
@@ -69,20 +58,20 @@ export default function Resultado() {
 
               <div className="flex justify-between text-red-600">
                 <span>Cuota Inicial:</span>
-                <span>- {formatMoney(plan.cuota_inicial)}</span>
+                <span>- {formatMoney(plan.cuota_inicial, currency)}</span>
               </div>
 
               <div className="flex justify-between text-green-600">
                 <span>Bono Techo Propio:</span>
                 <span>
-                  {Number(plan.bono_aplicable) > 0 ? `- ${formatMoney(plan.bono_aplicable)}` : "No aplica"}
+                  {Number(plan.bono_aplicable) > 0 ? `- ${formatMoney(plan.bono_aplicable, currency)}` : "No aplica"}
                 </span>
               </div>
             </div>
           </div>
           <div className="border-t pt-3 mt-3 flex justify-between font-bold text-lg text-blue-900 bg-blue-50 -mx-4 -mb-4 p-4 rounded-b-lg">
             <span>A Financiar:</span>
-            <span>{formatMoney(plan.monto_prestamo)}</span>
+            <span>{formatMoney(plan.monto_prestamo, currency)}</span>
           </div>
         </Card>
 
@@ -127,12 +116,12 @@ export default function Resultado() {
           <div className="space-y-2 text-xs text-gray-600 bg-white p-3 rounded border border-purple-100 shadow-sm">
             <div className="flex justify-between">
               <span>Total Intereses a Pagar:</span>
-              <span className="font-semibold text-gray-800">{formatMoney(plan.total_intereses)}</span>
+              <span className="font-semibold text-gray-800">{formatMoney(plan.total_intereses, currency)}</span>
             </div>
             <div className="flex justify-between">
               <span>VAN (Valor Actual Neto):</span>
               <span className={`font-semibold ${indicadores.van < 0 ? 'text-red-500' : 'text-green-600'}`}>
-                {formatMoney(indicadores.van)}
+                {formatMoney(indicadores.van, currency)}
               </span>
             </div>
             <div className="flex justify-between">
@@ -141,7 +130,7 @@ export default function Resultado() {
             </div>
             <div className="flex justify-between border-t border-gray-200 pt-2 mt-2">
               <span className="font-medium">Desembolso Neto:</span>
-              <span className="font-bold text-gray-800">{formatMoney(flujoInicial)}</span>
+              <span className="font-bold text-gray-800">{formatMoney(flujoInicial, currency)}</span>
             </div>
           </div>
         </Card>
@@ -172,21 +161,21 @@ export default function Resultado() {
               {cuotas?.map((c) => (
                 <tr key={c.numero} className="hover:bg-gray-50 transition-colors">
                   <td className="p-3 text-center text-gray-400 font-medium">{c.numero}</td>
-                  <td className="p-3 text-gray-600">{formatMoney(c.saldo_inicial)}</td>
-                  <td className="p-3 font-medium text-green-600">{formatMoney(c.amortizacion)}</td>
-                  <td className="p-3 text-red-500">{formatMoney(c.interes)}</td>
+                  <td className="p-3 text-gray-600">{formatMoney(c.saldo_inicial, currency)}</td>
+                  <td className="p-3 font-medium text-green-600">{formatMoney(c.amortizacion, currency)}</td>
+                  <td className="p-3 text-red-500">{formatMoney(c.interes, currency)}</td>
 
-                  <td className="p-3 bg-yellow-50/30 text-gray-500">{formatMoney(c.seguro_desgravamen)}</td>
-                  <td className="p-3 bg-yellow-50/30 text-gray-500">{formatMoney(c.seguro_riesgo)}</td>
+                  <td className="p-3 bg-yellow-50/30 text-gray-500">{formatMoney(c.seguro_desgravamen, currency)}</td>
+                  <td className="p-3 bg-yellow-50/30 text-gray-500">{formatMoney(c.seguro_riesgo, currency)}</td>
                   <td className="p-3 bg-yellow-50/30 text-gray-500">
-                    {formatMoney(Number(c.comision) + Number(c.portes) + Number(c.gastos_administrativos))}
+                    {formatMoney(Number(c.comision) + Number(c.portes) + Number(c.gastos_administrativos), currency)}
                   </td>
 
                   <td className="p-3 bg-blue-50 font-bold text-blue-800 border-l border-blue-100">
-                    {formatMoney(Math.abs(c.flujo))}
+                    {formatMoney(Math.abs(c.flujo), currency)}
                   </td>
 
-                  <td className="p-3 text-gray-400">{formatMoney(c.saldo_final)}</td>
+                  <td className="p-3 text-gray-400">{formatMoney(c.saldo_final, currency)}</td>
                 </tr>
               ))}
             </tbody>

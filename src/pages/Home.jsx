@@ -1,11 +1,29 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
+import { getAllPlanPagosByUserId } from "../api/planPago.api";
 import Card from "../components/ui/Card";
 import Profile from "../components/ui/Profile";
+import Button from "../components/ui/Button";
+import { formatDate, formatMoney } from "../utils/format";
 
 export default function Home() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
+  const [recentPlans, setRecentPlans] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (user?.id) {
+      getAllPlanPagosByUserId(user.id)
+        .then((res) => {
+          const sorted = res.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+          setRecentPlans(sorted.slice(0, 3));
+        })
+        .catch((err) => console.error("Error fetching recent plans:", err))
+        .finally(() => setLoading(false));
+    }
+  }, [user]);
 
   const quickActions = [
     {
@@ -56,12 +74,41 @@ export default function Home() {
       </div>
 
       <div className="mt-10">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">Resumen</h2>
-        <Card className="bg-white">
-          <div className="p-4 text-center text-gray-500">
-            <p>Aquí verás un resumen de tus actividades recientes pronto.</p>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold text-gray-800">Actividad Reciente</h2>
+          <Button variant="outline" onClick={() => navigate("/history")} className="text-sm">
+            Ver todo
+          </Button>
+        </div>
+
+        {loading ? (
+          <p className="text-gray-500">Cargando actividad...</p>
+        ) : recentPlans.length === 0 ? (
+          <Card className="bg-white text-center py-8">
+            <p className="text-gray-500 mb-4">Aún no tienes simulaciones recientes.</p>
+            <Button onClick={() => navigate("/locales")}>Crear mi primera simulación</Button>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {recentPlans.map((plan) => (
+              <Card key={plan.id} className="hover:shadow-md transition-shadow cursor-pointer border-l-4 border-l-blue-500">
+                <div className="flex justify-between items-start mb-2">
+                  <h3 className="font-bold text-gray-800 truncate">{plan.Local?.nombre}</h3>
+                  <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                    {formatDate(plan.createdAt)}
+                  </span>
+                </div>
+                <p className="text-sm text-blue-600 font-medium mb-1">{plan.EntidadFinanciera?.nombre}</p>
+                <div className="mt-3 pt-3 border-t border-gray-100 flex justify-between items-center">
+                  <span className="text-xs text-gray-500">Cuota Mensual:</span>
+                  <span className="font-bold text-gray-800">
+                    {formatMoney(plan.cuota_fija, plan.moneda)}
+                  </span>
+                </div>
+              </Card>
+            ))}
           </div>
-        </Card>
+        )}
       </div>
     </div>
   );

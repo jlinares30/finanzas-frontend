@@ -9,6 +9,7 @@ import { getEntidadById } from "../api/entidadFinanciera.api";
 import { getLocalById } from "../api/locales.api";
 import { useSimulationStore } from "../store/useSimulationStore";
 import { useAuthStore } from "../store/useAuthStore";
+import { formatMoney } from "../utils/format";
 
 export default function Simulador() {
   const navigate = useNavigate();
@@ -149,7 +150,7 @@ export default function Simulador() {
         {/* SECCIÓN 1: DATOS DEL INMUEBLE */}
         <div className="grid grid-cols-2 gap-4">
           <Input label="Local Seleccionado" value={local.nombre} disabled />
-          <Input label={`Precio Venta (${local.moneda})`} value={`${monedaSymbol} ${local.precio}`} disabled />
+          <Input label={`Precio Venta (${local.moneda})`} value={`${formatMoney(local.precio, local.moneda)}`} disabled />
         </div>
 
         {/* SECCIÓN 2: DATOS DEL CRÉDITO */}

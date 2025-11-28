@@ -6,6 +6,7 @@ import { useAuthStore } from "../store/useAuthStore";
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import Profile from "../components/ui/Profile";
+import { formatMoney } from "../utils/format";
 
 export default function LocalList() {
   const [locales, setLocales] = useState([]);
@@ -79,7 +80,7 @@ export default function LocalList() {
 
               <div className="mt-2">
                 <p className="text-sm">
-                  <strong>Precio:</strong> {local.moneda} {local.precio}
+                  <strong>Precio:</strong> {formatMoney(local.precio, local.moneda)}
                 </p>
                 <p className="text-sm">
                   <strong>Tipo:</strong> {local.tipo}

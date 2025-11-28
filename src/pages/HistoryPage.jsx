@@ -5,6 +5,7 @@ import Modal from "../components/ui/Modal";
 import Profile from "../components/ui/Profile";
 import { getAllPlanPagosByUserId, deletePlanPago } from "../api/planPago.api";
 import { useAuthStore } from "../store/useAuthStore";
+import { formatDate, formatMoney } from "../utils/format";
 
 export default function HistoryPage() {
     const [planPagos, setPlanPagos] = useState([]);
@@ -51,13 +52,6 @@ export default function HistoryPage() {
         setSelectedPlan(null);
     };
 
-    const formatDate = (dateString) => {
-        if (!dateString) return "-";
-        return new Date(dateString).toLocaleDateString("es-PE", {
-            year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
-        });
-    };
-
     return (
         <div className="p-6 space-y-6">
             <div className="flex justify-between items-center">
@@ -77,12 +71,12 @@ export default function HistoryPage() {
                                 <div className="flex justify-between items-start mb-2">
                                     <h3 className="font-bold text-lg text-blue-700">{plan.EntidadFinanciera?.nombre}</h3>
                                     <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">
-                                        {new Date(plan.createdAt).toLocaleDateString()}
+                                        {formatDate(plan.createdAt)}
                                     </span>
                                 </div>
                                 <h4 className="font-semibold text-gray-700 mb-1">{plan.Local?.nombre}</h4>
                                 <p className="text-sm text-gray-600 mb-4">
-                                    Monto: {plan.moneda === 'USD' ? '$' : 'S/'} {parseFloat(plan.monto_prestamo).toFixed(2)}
+                                    Monto: {formatMoney(plan.monto_prestamo, plan.moneda)}
                                 </p>
                             </div>
 
@@ -119,13 +113,13 @@ export default function HistoryPage() {
                                 <div>
                                     <p className="text-xs text-gray-500 uppercase font-bold">Cuota Mensual</p>
                                     <p className="text-xl font-bold text-blue-800">
-                                        {selectedPlan.moneda === 'USD' ? '$' : 'S/'} {parseFloat(selectedPlan.cuota_fija).toFixed(2)}
+                                        {formatMoney(selectedPlan.cuota_fija, selectedPlan.moneda)}
                                     </p>
                                 </div>
                                 <div>
                                     <p className="text-xs text-gray-500 uppercase font-bold">Total Intereses</p>
                                     <p className="text-lg font-semibold text-gray-700">
-                                        {selectedPlan.moneda === 'USD' ? '$' : 'S/'} {parseFloat(selectedPlan.total_intereses).toFixed(2)}
+                                        {formatMoney(selectedPlan.total_intereses, selectedPlan.moneda)}
                                     </p>
                                 </div>
                             </div>
@@ -135,8 +129,8 @@ export default function HistoryPage() {
                         <div>
                             <h4 className="font-bold text-gray-800 border-b pb-2 mb-3">Datos del Préstamo</h4>
                             <div className="grid grid-cols-2 gap-y-2 text-sm">
-                                <p><span className="font-semibold">Monto Préstamo:</span> {selectedPlan.monto_prestamo}</p>
-                                <p><span className="font-semibold">Cuota Inicial:</span> {selectedPlan.cuota_inicial}</p>
+                                <p><span className="font-semibold">Monto Préstamo:</span> {formatMoney(selectedPlan.monto_prestamo, selectedPlan.moneda)}</p>
+                                <p><span className="font-semibold">Cuota Inicial:</span> {formatMoney(selectedPlan.cuota_inicial, selectedPlan.moneda)}</p>
                                 <p><span className="font-semibold">Plazo:</span> {selectedPlan.num_anios} años ({selectedPlan.total_cuotas} cuotas)</p>
                                 <p><span className="font-semibold">Frecuencia:</span> {selectedPlan.frecuencia_pago}</p>
                                 <p><span className="font-semibold">Tasa Interés:</span> {(parseFloat(selectedPlan.EntidadFinanciera?.tasa_interes) * 100).toFixed(2)}% ({selectedPlan.EntidadFinanciera?.tipo_tasa})</p>
@@ -150,7 +144,7 @@ export default function HistoryPage() {
                             <div className="text-sm">
                                 <p className="font-semibold">{selectedPlan.Local?.nombre}</p>
                                 <p className="text-gray-600">{selectedPlan.Local?.direccion}</p>
-                                <p className="mt-1"><span className="font-semibold">Precio Venta:</span> {selectedPlan.Local?.moneda === 'USD' ? '$' : 'S/'} {selectedPlan.precio_venta}</p>
+                                <p className="mt-1"><span className="font-semibold">Precio Venta:</span> {formatMoney(selectedPlan.precio_venta, selectedPlan.moneda)}</p>
                             </div>
                         </div>
 
