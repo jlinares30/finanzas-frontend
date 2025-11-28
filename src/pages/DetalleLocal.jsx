@@ -37,8 +37,9 @@ export default function DetalleLocal() {
 
   const seleccionarLocal = () => {
     if (!local) return;
-    setSimulationData(entidadId, local.id);
-    navigate(`/simulador`);
+    // No need to set simulation data here yet, or maybe we can set localId
+    // setSimulationData(null, local.id); 
+    navigate(`/local/${local.id}/entidades`);
   };
 
   const handleCostoInicialChange = (e) => {
@@ -147,7 +148,7 @@ export default function DetalleLocal() {
         )}
 
         <Button onClick={seleccionarLocal} className="bg-green-600 hover:bg-green-700">
-          Seleccionar y Simular Préstamo
+          Ver Entidades Financieras
         </Button>
       </div>
     </div>

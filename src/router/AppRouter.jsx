@@ -8,6 +8,7 @@ import Simulador from "../pages/Simulador";
 import Resultado from "../pages/Resultado";
 import LocalList from "../pages/LocalList";
 import DetalleLocal from "../pages/DetalleLocal";
+import EntidadList from "../pages/EntidadList";
 import MainLayout from "../layout/MainLayout";
 import ProtectedRoute from "./ProtectedRoute";
 import ProfilePage from "../pages/ProfilePage";
@@ -40,6 +41,18 @@ export default function AppRouter() {
               </ProtectedRoute>
             }
           />
+
+          <Route
+            path="/locales"
+            element={
+              <ProtectedRoute>
+                <LocalList />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Ruta antigua mantenida por compatibilidad o redirigida si se desea, 
+              pero LocalList ahora manejará la ausencia de entidadId */}
           <Route
             path="/entidad/:entidadId/locales"
             element={
@@ -48,6 +61,7 @@ export default function AppRouter() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/entidad/:entidadId/local/:localId"
             element={
@@ -56,6 +70,27 @@ export default function AppRouter() {
               </ProtectedRoute>
             }
           />
+
+          {/* Nueva ruta para detalle de local sin entidad previa */}
+          <Route
+            path="/local/:localId"
+            element={
+              <ProtectedRoute>
+                <DetalleLocal />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Nueva ruta para listar entidades para un local específico */}
+          <Route
+            path="/local/:localId/entidades"
+            element={
+              <ProtectedRoute>
+                <EntidadList />
+              </ProtectedRoute>
+            }
+          />
+
           <Route
             path="/simulador"
             element={
