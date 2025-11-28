@@ -75,18 +75,11 @@ export default function ProfilePage() {
         try {
             setLoading(true);
 
-            // Actualizar usuario
-            await updateProfile(userData);
+            await updateProfile({ ...userData, id: authUser.id });
+            console.log(userData);
+            await updateSocioeconomico({ ...socioData, id: authUser.id });
 
-            // Actualizar socioeconómico
-            await updateSocioeconomico(socioData);
-
-            // Actualizar store si es necesario (opcional, pero buena práctica para mantener consistencia)
-            // Nota: El backend debería devolver el usuario actualizado, pero por ahora usamos lo que enviamos
-            // o hacemos un refetch si el login action lo soporta.
-            // Simplemente actualizamos el store con los datos básicos que tenemos
             login(useAuthStore.getState().token, { ...authUser, ...userData });
-
             setIsEditing(false);
             alert("Perfil actualizado correctamente");
         } catch (error) {
@@ -104,9 +97,11 @@ export default function ProfilePage() {
             <Card className="w-full max-w-2xl">
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-2xl font-bold">Mi Perfil</h2>
-                    <Button onClick={() => isEditing ? handleSave() : setIsEditing(true)} disabled>
-                        {isEditing ? "Guardar Cambios" : "Editar Perfil"}
-                    </Button>
+                    {!isEditing && (
+                        <Button onClick={() => setIsEditing(true)}>
+                            Editar Perfil
+                        </Button>
+                    )}
                 </div>
 
                 <div className="flex flex-col items-center mb-8">
