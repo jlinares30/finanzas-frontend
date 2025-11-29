@@ -42,17 +42,15 @@ export default function EntidadList() {
         navigate("/simulador");
     };
 
-    // LÓGICA DE FILTRADO Y ORDENAMIENTO
+    // LÓGICA DE FILTRADO Y ORDENAMIENTO ORIGINAL
     const entidadesFiltradas = entidades.filter(entidad => {
         if (!local) return true;
-
         return true;
     }).sort((a, b) => {
         const precioLocal = Number(local?.precio || 0);
         const esTechoPropio = precioLocal <= 128900;
 
         if (esTechoPropio) {
-
             if (a.aplica_bono_techo_propio && !b.aplica_bono_techo_propio) return -1;
             if (!a.aplica_bono_techo_propio && b.aplica_bono_techo_propio) return 1;
         }
@@ -63,69 +61,71 @@ export default function EntidadList() {
         return Number(entidad.tasa_interes) < 0.12;
     };
 
-    if (loading) return <div className="p-6">Cargando...</div>;
+    if (loading) return (
+        <div className="flex items-center justify-center min-h-screen">
+            <div className="text-center">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-green-600 mx-auto mb-4"></div>
+                <p className="text-lg text-gray-600">Cargando...</p>
+            </div>
+        </div>
+    );
 
-    //Orden de prioridad 
-    //Si el precio es menor a 128900 se ordena por entidad que aplica bono techo propio
-    //tasa de interes menor a 12% 
     return (
-        <div className="p-6 min-h-screen bg-gray-50">
-            <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold">Elige una Entidad Financiera</h2>
+        <div className="p-8 min-h-screen bg-gray-50/50">
+            <div className="flex justify-between items-center mb-8">
+                <div>
+                    <h2 className="text-3xl font-bold text-gray-800">Elige una Entidad Financiera</h2>
+                    {local && <p className="text-gray-600 mt-1">Para el local: <span className="font-semibold text-green-700">{local.nombre}</span></p>}
+                </div>
                 <Profile />
             </div>
-            {local && <p className="mb-6 text-gray-600">Para el local: <strong>{local.nombre}</strong></p>}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {entidadesFiltradas.map((entidad) => {
                     const recommended = isRecommended(entidad);
-
-                    // Verificación visual de moneda
-                    const mismaMoneda = local && local.moneda === entidad.moneda;
-
+                    
                     return (
                         <Card
                             key={entidad.id}
-                            className={`shadow-md transition-all relative overflow-hidden ${recommended ? 'border-2 border-green-500 bg-green-50' : 'bg-white'}`}
+                            className={`transition-all duration-300 hover:shadow-xl border relative ${
+                                recommended 
+                                ? 'border-green-400 bg-green-50/30' 
+                                : 'border-gray-200 bg-white'
+                            }`}
                         >
                             {recommended && (
-                                <div className="absolute top-0 right-0 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
-                                    Mejor Tasa
+                                <div className="absolute top-0 right-0 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg shadow-sm">
+                                    Recomendado
                                 </div>
                             )}
 
-                            <h3 className="text-lg font-bold text-gray-800 mt-2">{entidad.nombre}</h3>
-
-                            {/* Tags informativos */}
-                            <div className="flex gap-2 my-2 flex-wrap">
-                                <span className={`text-xs px-2 py-1 rounded font-semibold ${entidad.moneda === 'PEN' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}`}>
-                                    {entidad.moneda === 'PEN' ? 'Soles' : 'Dólares'}
-                                </span>
-                                {!mismaMoneda && (
-                                    <span className="text-xs px-2 py-1 rounded bg-orange-100 text-orange-800 font-semibold">
-                                        Requiere Cambio
-                                    </span>
-                                )}
-                                {entidad.aplica_bono_techo_propio && (
-                                    <span className="text-xs px-2 py-1 rounded bg-blue-100 text-blue-800 font-semibold">
-                                        Acepta Bono
-                                    </span>
-                                )}
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl shadow-sm ${recommended ? 'bg-green-100' : 'bg-gray-100'}`}>
+                                    🏦
+                                </div>
+                                <h3 className="text-xl font-bold text-gray-800">{entidad.nombre}</h3>
                             </div>
 
-                            <div className="text-sm space-y-2 text-gray-600 mt-3">
-                                <div className="flex justify-between border-b pb-1">
-                                    <span>Tasa ({entidad.tipo_tasa === "EFECTIVA" ? "TEA" : "TNA"}):</span>
-                                    <span className="font-bold text-gray-900">{formatPercent(entidad.tasa_interes)}</span>
+                            <div className="space-y-3 mb-6">
+                                <div className="flex justify-between items-center p-2 bg-white rounded border border-gray-100">
+                                    <span className="text-sm text-gray-600 font-medium">Tasa ({entidad.tipo_tasa === "EFECTIVA" ? "TEA" : "TNA"}):</span>
+                                    <span className="font-bold text-lg text-gray-800">{formatPercent(entidad.tasa_interes)}</span>
                                 </div>
-                                <div className="flex justify-between border-b pb-1">
-                                    <span>Gracia:</span>
-                                    <span>{entidad.periodos_gracia_permitidos !== "SIN_GRACIA" ? `Hasta ${entidad.max_meses_gracia} meses` : "No"}</span>
+                                
+                                <div className="flex flex-wrap gap-2">
+                                    <span className={`text-xs px-2 py-1 rounded border font-semibold ${entidad.moneda === 'PEN' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' : 'bg-green-50 text-green-700 border-green-200'}`}>
+                                        {entidad.moneda === 'PEN' ? 'Soles' : 'Dólares'}
+                                    </span>
+                                    {entidad.aplica_bono_techo_propio && (
+                                        <span className="text-xs px-2 py-1 rounded border font-semibold bg-blue-50 text-blue-700 border-blue-200">
+                                            Bono Techo Propio
+                                        </span>
+                                    )}
                                 </div>
                             </div>
 
                             <Button
-                                className={`mt-4 w-full ${recommended ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-800 hover:bg-gray-900'}`}
+                                className={`w-full py-3 ${recommended ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-800 hover:bg-gray-900'}`}
                                 onClick={() => seleccionarEntidad(entidad.id)}
                             >
                                 Simular con {entidad.moneda}

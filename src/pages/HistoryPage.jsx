@@ -22,7 +22,6 @@ export default function HistoryPage() {
     const loadPlans = async () => {
         try {
             const res = await getAllPlanPagosByUserId(user.id);
-            console.log(res.data);
             const sortedPlans = res.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
             setPlanPagos(sortedPlans);
         } catch (error) {
@@ -47,114 +46,172 @@ export default function HistoryPage() {
         setIsModalOpen(true);
     };
 
-    const closeModal = () => {
-        setIsModalOpen(false);
-        setSelectedPlan(null);
-    };
-
     return (
-        <div className="p-6 space-y-6">
-            <div className="flex justify-between items-center">
-                <h1 className="text-2xl font-bold text-gray-800">Historial de Simulaciones</h1>
+        <div className="p-8 min-h-screen">
+            <div className="flex justify-between items-center mb-10">
+                <div>
+                    <h1 className="text-4xl font-bold text-gray-800 mb-2">Historial de Simulaciones</h1>
+                    <p className="text-lg text-gray-600">Consulta y gestiona tus planes guardados</p>
+                </div>
                 <Profile />
             </div>
 
             {planPagos.length === 0 ? (
-                <Card className="text-center p-8">
-                    <p className="text-gray-500">No tienes simulaciones guardadas.</p>
+                <Card className="text-center py-16">
+                    <div className="text-6xl mb-4">📂</div>
+                    <p className="text-xl text-gray-500 font-medium">No tienes simulaciones guardadas aún.</p>
                 </Card>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {planPagos.map((plan) => (
-                        <Card key={plan.id} className="flex flex-col justify-between h-full hover:shadow-lg transition-shadow">
-                            <div>
-                                <div className="flex justify-between items-start mb-2">
-                                    <h3 className="font-bold text-lg text-blue-700">{plan.EntidadFinanciera?.nombre}</h3>
-                                    <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">
+                        <Card 
+                            key={plan.id} 
+                            className="flex flex-col justify-between h-full hover:shadow-xl transition-all duration-300 border-l-4 border-l-blue-600 group"
+                        >
+                            <div className="p-2">
+                                <div className="flex justify-between items-start mb-3">
+                                    <span className="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full uppercase tracking-wider">
+                                        {plan.EntidadFinanciera?.nombre}
+                                    </span>
+                                    <span className="text-xs text-gray-400 font-medium">
                                         {formatDate(plan.createdAt)}
                                     </span>
                                 </div>
-                                <h4 className="font-semibold text-gray-700 mb-1">{plan.Local?.nombre}</h4>
-                                <p className="text-sm text-gray-600 mb-4">
-                                    Monto: {formatMoney(plan.monto_prestamo, plan.moneda)}
-                                </p>
+                                
+                                <h4 className="text-xl font-bold text-gray-800 mb-1 group-hover:text-blue-700 transition-colors">
+                                    {plan.Local?.nombre}
+                                </h4>
+                                <p className="text-sm text-gray-500 mb-4 line-clamp-1">{plan.Local?.direccion}</p>
+                                
+                                <div className="bg-gray-50 p-3 rounded-lg border border-gray-100 mb-4">
+                                    <p className="text-xs text-gray-500 uppercase font-bold mb-1">Monto del Préstamo</p>
+                                    <p className="text-lg font-bold text-gray-800">{formatMoney(plan.monto_prestamo, plan.moneda)}</p>
+                                </div>
                             </div>
 
-                            <div className="flex gap-2 mt-4">
+                            <div className="flex gap-3 pt-2 border-t border-gray-100 mt-2">
                                 <Button
                                     onClick={() => handleViewDetails(plan)}
-                                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-xs"
+                                    className="flex-1 py-2 text-sm bg-blue-600 hover:bg-blue-700"
                                 >
                                     Ver Detalle
                                 </Button>
-                                <Button
+                                <button
                                     onClick={() => handleDelete(plan.id)}
-                                    className="flex-1 bg-red-500 hover:bg-red-600 text-xs"
+                                    className="px-4 py-2 text-sm font-semibold text-red-500 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
                                 >
                                     Eliminar
-                                </Button>
+                                </button>
                             </div>
                         </Card>
                     ))}
                 </div>
             )}
 
-            {/* Modal de Detalles */}
             <Modal
                 isOpen={isModalOpen}
-                onClose={closeModal}
+                onClose={() => setIsModalOpen(false)}
                 title="Detalle de la Simulación"
             >
                 {selectedPlan && (
                     <div className="space-y-6">
-                        {/* Resumen Principal */}
-                        <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <p className="text-xs text-gray-500 uppercase font-bold">Cuota Mensual</p>
-                                    <p className="text-xl font-bold text-blue-800">
-                                        {formatMoney(selectedPlan.cuota_fija, selectedPlan.moneda)}
-                                    </p>
+                        {/* Header Resumen (Diseño Moderno) */}
+                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-100 flex justify-between items-center shadow-sm">
+                            <div>
+                                <p className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-1">Cuota Mensual</p>
+                                <p className="text-3xl font-extrabold text-blue-900">
+                                    {formatMoney(selectedPlan.cuota_fija, selectedPlan.moneda)}
+                                </p>
+                            </div>
+                            <div className="text-right">
+                                <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Total Intereses</p>
+                                <p className="text-xl font-bold text-gray-700">
+                                    {formatMoney(selectedPlan.total_intereses, selectedPlan.moneda)}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* Columna 1: Datos del Préstamo (Todos los campos originales) */}
+                            <div className="bg-white border border-gray-200 p-5 rounded-xl shadow-sm h-full">
+                                <h4 className="font-bold text-gray-800 border-b pb-2 mb-3 flex items-center gap-2">
+                                    <span>🏦</span> Datos del Préstamo
+                                </h4>
+                                <ul className="space-y-3 text-sm text-gray-600">
+                                    <li className="flex justify-between">
+                                        <span>Monto Préstamo:</span> 
+                                        <span className="font-semibold text-gray-800">{formatMoney(selectedPlan.monto_prestamo, selectedPlan.moneda)}</span>
+                                    </li>
+                                    <li className="flex justify-between">
+                                        <span>Cuota Inicial:</span> 
+                                        <span className="font-semibold text-gray-800">{formatMoney(selectedPlan.cuota_inicial, selectedPlan.moneda)}</span>
+                                    </li>
+                                    <li className="flex justify-between">
+                                        <span>Plazo:</span> 
+                                        <span className="font-semibold text-gray-800">{selectedPlan.num_anios} años ({selectedPlan.total_cuotas} cuotas)</span>
+                                    </li>
+                                    <li className="flex justify-between">
+                                        <span>Frecuencia:</span> 
+                                        <span className="font-semibold text-gray-800 capitalize">{selectedPlan.frecuencia_pago}</span>
+                                    </li>
+                                    <li className="flex justify-between">
+                                        <span>Tasa Interés:</span> 
+                                        <span className="font-semibold text-gray-800">
+                                            {(parseFloat(selectedPlan.EntidadFinanciera?.tasa_interes) * 100).toFixed(2)}% ({selectedPlan.EntidadFinanciera?.tipo_tasa})
+                                        </span>
+                                    </li>
+                                    <li className="flex justify-between">
+                                        <span>Periodo Gracia:</span> 
+                                        <span className="font-semibold text-gray-800 text-right">
+                                            {selectedPlan.tipo_gracia !== "SIN_GRACIA" 
+                                                ? (selectedPlan.tipo_gracia === "TOTAL" ? "Total" : "Parcial") 
+                                                : "Sin Gracia"} 
+                                            <span className="block text-xs font-normal text-gray-500">({selectedPlan.meses_gracia} meses)</span>
+                                        </span>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            {/* Columna 2: Inmueble y Entidad (Todos los campos originales) */}
+                            <div className="flex flex-col gap-6 h-full">
+                                <div className="bg-white border border-gray-200 p-5 rounded-xl shadow-sm flex-1">
+                                    <h4 className="font-bold text-gray-800 border-b pb-2 mb-3 flex items-center gap-2">
+                                        <span>🏢</span> Inmueble
+                                    </h4>
+                                    <div className="text-sm text-gray-600 space-y-2">
+                                        <div>
+                                            <p className="font-bold text-gray-800 text-base">{selectedPlan.Local?.nombre}</p>
+                                            <p className="text-xs text-gray-500">{selectedPlan.Local?.direccion}</p>
+                                        </div>
+                                        <div className="flex justify-between pt-2 border-t border-gray-100">
+                                            <span>Precio Venta:</span> 
+                                            <span className="font-semibold text-gray-800">{formatMoney(selectedPlan.precio_venta, selectedPlan.moneda)}</span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <p className="text-xs text-gray-500 uppercase font-bold">Total Intereses</p>
-                                    <p className="text-lg font-semibold text-gray-700">
-                                        {formatMoney(selectedPlan.total_intereses, selectedPlan.moneda)}
-                                    </p>
+
+                                <div className="bg-white border border-gray-200 p-5 rounded-xl shadow-sm flex-1">
+                                    <h4 className="font-bold text-gray-800 border-b pb-2 mb-3 flex items-center gap-2">
+                                        <span>💼</span> Entidad Financiera
+                                    </h4>
+                                    <ul className="space-y-2 text-sm text-gray-600">
+                                        <li className="flex justify-between">
+                                            <span className="font-semibold text-gray-800">{selectedPlan.EntidadFinanciera?.nombre}</span>
+                                        </li>
+                                        <li className="flex justify-between">
+                                            <span>Bono Techo Propio:</span> 
+                                            <span className={`font-semibold ${selectedPlan.EntidadFinanciera?.aplica_bono_techo_propio ? "text-green-600" : "text-gray-500"}`}>
+                                                {selectedPlan.EntidadFinanciera?.aplica_bono_techo_propio ? "Sí" : "No"}
+                                            </span>
+                                        </li>
+                                        <li className="flex justify-between">
+                                            <span>Seguro Desgravamen:</span> 
+                                            <span className="font-semibold text-gray-800">
+                                                {selectedPlan.EntidadFinanciera?.aplica_seguro_desgravamen ? "Sí" : "No"}
+                                            </span>
+                                        </li>
+                                    </ul>
                                 </div>
-                            </div>
-                        </div>
-
-                        {/* Detalles del Préstamo */}
-                        <div>
-                            <h4 className="font-bold text-gray-800 border-b pb-2 mb-3">Datos del Préstamo</h4>
-                            <div className="grid grid-cols-2 gap-y-2 text-sm">
-                                <p><span className="font-semibold">Monto Préstamo:</span> {formatMoney(selectedPlan.monto_prestamo, selectedPlan.moneda)}</p>
-                                <p><span className="font-semibold">Cuota Inicial:</span> {formatMoney(selectedPlan.cuota_inicial, selectedPlan.moneda)}</p>
-                                <p><span className="font-semibold">Plazo:</span> {selectedPlan.num_anios} años ({selectedPlan.total_cuotas} cuotas)</p>
-                                <p><span className="font-semibold">Frecuencia:</span> {selectedPlan.frecuencia_pago}</p>
-                                <p><span className="font-semibold">Tasa Interés:</span> {(parseFloat(selectedPlan.EntidadFinanciera?.tasa_interes) * 100).toFixed(2)}% ({selectedPlan.EntidadFinanciera?.tipo_tasa})</p>
-                                <p><span className="font-semibold">Periodo Gracia:</span> {selectedPlan.tipo_gracia !== "SIN_GRACIA" ? selectedPlan.tipo_gracia === "TOTAL" ? "Total" : "Parcial" : "Sin Gracia"} ({selectedPlan.meses_gracia} meses)</p>
-                            </div>
-                        </div>
-
-                        {/* Detalles del Inmueble */}
-                        <div>
-                            <h4 className="font-bold text-gray-800 border-b pb-2 mb-3">Inmueble</h4>
-                            <div className="text-sm">
-                                <p className="font-semibold">{selectedPlan.Local?.nombre}</p>
-                                <p className="text-gray-600">{selectedPlan.Local?.direccion}</p>
-                                <p className="mt-1"><span className="font-semibold">Precio Venta:</span> {formatMoney(selectedPlan.precio_venta, selectedPlan.moneda)}</p>
-                            </div>
-                        </div>
-
-                        {/* Detalles de la Entidad */}
-                        <div>
-                            <h4 className="font-bold text-gray-800 border-b pb-2 mb-3">Entidad Financiera</h4>
-                            <div className="text-sm">
-                                <p className="font-semibold">{selectedPlan.EntidadFinanciera?.nombre}</p>
-                                <p>Bono Techo Propio: {selectedPlan.EntidadFinanciera?.aplica_bono_techo_propio ? "Sí" : "No"}</p>
-                                <p>Seguro Desgravamen: {selectedPlan.EntidadFinanciera?.aplica_seguro_desgravamen ? "Sí" : "No"}</p>
                             </div>
                         </div>
 
