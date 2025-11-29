@@ -31,42 +31,47 @@ export default function Profile() {
         <div className="relative" ref={dropdownRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center border p-1 rounded-full hover:bg-gray-50 transition-colors focus:outline-none cursor-pointer"
+                className="flex items-center border-2 border-gray-200 p-1 rounded-full hover:border-green-500 hover:shadow-md transition-all duration-200 focus:outline-none cursor-pointer"
             >
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm hover:bg-blue-700">
+                <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center text-white font-bold text-lg hover:from-green-600 hover:to-green-700 transition-all shadow-md">
                     {user.name?.charAt(0).toUpperCase()}
                 </div>
             </button>
 
             {isOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 border border-gray-100">
+                <div className="absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-2xl py-2 z-10 border border-gray-200">
+                    <div className="px-4 py-3 border-b border-gray-100">
+                        <p className="text-sm font-semibold text-gray-800 truncate">{user.name}</p>
+                        <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                    </div>
+                    
                     <Link
                         to="/"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        className="flex items-center gap-2 px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors"
                         onClick={() => setIsOpen(false)}
                     >
-                        <p className="text-sm">Home</p>
+                        <span className="font-medium">Home</span>
                     </Link>
                     <Link
                         to="/profile"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        className="flex items-center gap-2 px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors"
                         onClick={() => setIsOpen(false)}
                     >
-                        <p className="text-sm">Perfil</p>
+                        <span className="font-medium">Perfil</span>
                     </Link>
                     <Link
                         to="/history"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        className="flex items-center gap-2 px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors"
                         onClick={() => setIsOpen(false)}
                     >
-                        <p className="text-sm">Historial de Planes</p>
+                        <span className="font-medium">Historial de Planes</span>
                     </Link>
-                    <div className="border-t border-gray-100 my-1"></div>
+                    <div className="border-t border-gray-200 my-2"></div>
                     <button
                         onClick={handleLogout}
-                        className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                        className="flex items-center gap-2 w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 font-medium transition-colors"
                     >
-                        <p className="text-sm">Cerrar Sesión</p>
+                        <span>Cerrar Sesión</span>
                     </button>
                 </div>
             )}

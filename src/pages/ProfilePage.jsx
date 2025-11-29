@@ -92,37 +92,39 @@ export default function ProfilePage() {
         }
     };
 
-    if (loading && !userData.email) return <div className="p-6 text-center">Cargando perfil...</div>;
+    if (loading && !userData.email) return <div className="p-8 text-center text-lg text-gray-600">Cargando perfil...</div>;
 
     return (
-        <div className="p-6 flex justify-center">
-            <Card className="w-full max-w-2xl">
-                <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-bold">Mi Perfil</h2>
+        <div className="p-8 flex justify-center">
+            <Card className="w-full max-w-4xl">
+                <div className="flex justify-between items-center mb-8">
+                    <h2 className="text-3xl font-bold text-gray-800">Mi Perfil</h2>
                     <Profile />
                 </div>
 
-                <div className="flex flex-col items-center mb-8">
-                    <div className="w-24 h-24 bg-blue-500 rounded-full flex items-center justify-center text-white text-3xl font-bold mb-4">
+                <div className="flex flex-col items-center mb-10 pb-8 border-b border-gray-200">
+                    <div className="w-28 h-28 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white text-4xl font-bold mb-4 shadow-lg">
                         {userData.name?.charAt(0).toUpperCase()}
                     </div>
                     {!isEditing ? (
                         <>
-                            <h2 className="text-xl font-bold">{userData.name}</h2>
-                            <p className="text-gray-500">{userData.email}</p>
+                            <h2 className="text-2xl font-bold text-gray-800">{userData.name}</h2>
+                            <p className="text-gray-500 text-lg">{userData.email}</p>
                         </>
                     ) : (
-                        <div className="w-full max-w-sm space-y-2">
+                        <div className="w-full max-w-md space-y-2">
                             <Input label="Nombre" name="name" value={userData.name} onChange={handleChangeUser} />
                             <Input label="Email" name="email" value={userData.email} disabled />
                         </div>
                     )}
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                     {/* Datos Personales */}
-                    <div>
-                        <h3 className="text-lg font-semibold border-b pb-2 mb-4 text-blue-800">Datos Personales</h3>
+                    <div className="bg-blue-50 p-6 rounded-xl border border-blue-200">
+                        <h3 className="text-xl font-bold mb-6 text-blue-800 flex items-center gap-2">
+                            <span>👤</span> Datos Personales
+                        </h3>
                         <div className="space-y-4">
                             {isEditing ? (
                                 <>
@@ -133,18 +135,20 @@ export default function ProfilePage() {
                                 </>
                             ) : (
                                 <>
-                                    <div><span className="text-sm text-gray-500 block">DNI</span> <span className="font-medium">{userData.dni || "-"}</span></div>
-                                    <div><span className="text-sm text-gray-500 block">Edad</span> <span className="font-medium">{userData.age || "-"}</span></div>
-                                    <div><span className="text-sm text-gray-500 block">Género</span> <span className="font-medium">{userData.gender || "-"}</span></div>
-                                    <div><span className="text-sm text-gray-500 block">Fecha Nacimiento</span> <span className="font-medium">{userData.birthdate || "-"}</span></div>
+                                    <div className="bg-white p-3 rounded-lg"><span className="text-sm text-gray-600 block mb-1 font-medium">DNI</span> <span className="font-semibold text-gray-800">{userData.dni || "-"}</span></div>
+                                    <div className="bg-white p-3 rounded-lg"><span className="text-sm text-gray-600 block mb-1 font-medium">Edad</span> <span className="font-semibold text-gray-800">{userData.age || "-"}</span></div>
+                                    <div className="bg-white p-3 rounded-lg"><span className="text-sm text-gray-600 block mb-1 font-medium">Género</span> <span className="font-semibold text-gray-800">{userData.gender || "-"}</span></div>
+                                    <div className="bg-white p-3 rounded-lg"><span className="text-sm text-gray-600 block mb-1 font-medium">Fecha Nacimiento</span> <span className="font-semibold text-gray-800">{userData.birthdate || "-"}</span></div>
                                 </>
                             )}
                         </div>
                     </div>
 
                     {/* Datos Socioeconómicos */}
-                    <div>
-                        <h3 className="text-lg font-semibold border-b pb-2 mb-4 text-green-800">Datos Socioeconómicos</h3>
+                    <div className="bg-green-50 p-6 rounded-xl border border-green-200">
+                        <h3 className="text-xl font-bold mb-6 text-green-800 flex items-center gap-2">
+                            <span>💼</span> Datos Socioeconómicos
+                        </h3>
                         <div className="space-y-4">
                             {isEditing ? (
                                 <>
@@ -155,10 +159,10 @@ export default function ProfilePage() {
                                 </>
                             ) : (
                                 <>
-                                    <div><span className="text-sm text-gray-500 block">Ocupación</span> <span className="font-medium">{socioData.ocupacion || "-"}</span></div>
-                                    <div><span className="text-sm text-gray-500 block">Ingresos Mensuales</span> <span className="font-medium">{formatMoney(socioData.ingresos_mensuales)}</span></div>
-                                    <div><span className="text-sm text-gray-500 block">Tipo Contrato</span> <span className="font-medium">{socioData.tipo_contrato || "-"}</span></div>
-                                    <div><span className="text-sm text-gray-500 block">Nivel Educativo</span> <span className="font-medium">{socioData.nivel_educativo || "-"}</span></div>
+                                    <div className="bg-white p-3 rounded-lg"><span className="text-sm text-gray-600 block mb-1 font-medium">Ocupación</span> <span className="font-semibold text-gray-800">{socioData.ocupacion || "-"}</span></div>
+                                    <div className="bg-white p-3 rounded-lg"><span className="text-sm text-gray-600 block mb-1 font-medium">Ingresos Mensuales</span> <span className="font-semibold text-gray-800">{formatMoney(socioData.ingresos_mensuales)}</span></div>
+                                    <div className="bg-white p-3 rounded-lg"><span className="text-sm text-gray-600 block mb-1 font-medium">Tipo Contrato</span> <span className="font-semibold text-gray-800">{socioData.tipo_contrato || "-"}</span></div>
+                                    <div className="bg-white p-3 rounded-lg"><span className="text-sm text-gray-600 block mb-1 font-medium">Nivel Educativo</span> <span className="font-semibold text-gray-800">{socioData.nivel_educativo || "-"}</span></div>
                                 </>
                             )}
                         </div>
@@ -166,7 +170,7 @@ export default function ProfilePage() {
                 </div>
 
                 {!isEditing && (
-                    <div className="mt-6 flex justify-end gap-2">
+                    <div className="mt-8 flex justify-end gap-3">
                         <Button onClick={() => setIsEditing(true)}>
                             Editar Perfil
                         </Button>
@@ -174,7 +178,7 @@ export default function ProfilePage() {
                 )}
 
                 {isEditing && (
-                    <div className="mt-6 flex justify-end gap-2">
+                    <div className="mt-8 flex justify-end gap-3">
                         <Button className="bg-gray-500 hover:bg-gray-600" onClick={() => setIsEditing(false)}>Cancelar</Button>
                         <Button onClick={handleSave}>Guardar Cambios</Button>
                     </div>
