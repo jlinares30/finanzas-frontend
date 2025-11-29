@@ -48,13 +48,16 @@ export default function Register() {
         <Input label="Edad" name="age" value={form.age} onChange={update} />
         <Input label="Fecha de nacimiento" type="date" name="birthdate" value={form.birthdate} onChange={update} />
 
-        <Button className="mt-4 w-full" onClick={onSubmit}>
+        <Button className="mt-6 w-full py-3" onClick={onSubmit}>
           Registrar
         </Button>
 
-        <p className="text-sm mt-3 text-center">
-          ¿Ya tienes cuenta? <a className="text-blue-600" href="/login">Inicia Sesión</a>
-        </p>
+        <div>
+          <p className="mt-6 pt-6 border-t border-gray-200 text-center">
+          ¿Ya tienes cuenta? <a className="text-green-600 hover:text-green-700 font-semibold hover:underline transition-colors" href="/login">Inicia Sesión</a>
+          </p>
+        </div>
+        
       </Card>
     </div>
   );

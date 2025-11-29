@@ -34,20 +34,42 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <Card className="w-[400px]">
-        <h2 className="text-xl font-bold mb-4 text-center">Iniciar Sesión</h2>
+    <div className="min-h-screen flex items-center justify-center">
+      <Card className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold text-gray-800 mb-2">Bienvenido</h2>
+          <p className="text-gray-600">Ingresa a tu portal financiero</p>
+        </div>
 
-        <Input label="Email" name="email" value={form.email} onChange={update} />
-        <Input label="Password" type="password" name="password" value={form.password} onChange={update} />
+        <Input 
+          label="Email" 
+          name="email" 
+          type="email"
+          placeholder="tu@email.com"
+          value={form.email} 
+          onChange={update} 
+        />
+        <Input 
+          label="Contraseña" 
+          type="password" 
+          name="password" 
+          placeholder="••••••••"
+          value={form.password} 
+          onChange={update} 
+        />
 
-        <Button className="mt-4 w-full" onClick={onSubmit}>
-          Entrar
+        <Button className="mt-6 w-full text-base py-3" onClick={onSubmit}>
+          Iniciar Sesión
         </Button>
 
-        <p className="text-sm mt-3 text-center">
-          ¿No tienes cuenta? <a className="text-blue-600" href="/register">Regístrate</a>
-        </p>
+        <div className="mt-6 pt-6 border-t border-gray-200 text-center">
+          <p className="text-sm text-gray-600">
+            ¿No tienes cuenta?{" "}
+            <a className="text-green-600 hover:text-green-700 font-semibold hover:underline transition-colors" href="/register">
+              Regístrate aquí
+            </a>
+          </p>
+        </div>
       </Card>
     </div>
   );
