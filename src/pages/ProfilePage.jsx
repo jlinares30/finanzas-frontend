@@ -6,9 +6,11 @@ import Profile from "../components/ui/Profile";
 import { getProfile, updateProfile, updateSocioeconomico } from "../api/auth.api";
 import { useAuthStore } from "../store/useAuthStore";
 import { formatMoney } from "../utils/format";
+import { useConfirmation } from "../context/ConfirmationContext";
 
 export default function ProfilePage() {
     const { user: authUser, login } = useAuthStore();
+    const { alert } = useConfirmation();
     const [loading, setLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
 
@@ -83,10 +85,10 @@ export default function ProfilePage() {
 
             login(useAuthStore.getState().token, { ...authUser, ...userData });
             setIsEditing(false);
-            alert("Perfil actualizado correctamente");
+            alert("Perfil actualizado correctamente", "Éxito", "success");
         } catch (error) {
             console.error("Error actualizando perfil:", error);
-            alert("Error al actualizar el perfil");
+            alert("Error al actualizar el perfil", "Error", "error");
         } finally {
             setLoading(false);
         }

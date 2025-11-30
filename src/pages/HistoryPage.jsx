@@ -6,12 +6,14 @@ import Profile from "../components/ui/Profile";
 import { getAllPlanPagosByUserId, deletePlanPago } from "../api/planPago.api";
 import { useAuthStore } from "../store/useAuthStore";
 import { formatDate, formatMoney } from "../utils/format";
+import { useConfirmation } from "../context/ConfirmationContext";
 
 export default function HistoryPage() {
     const [planPagos, setPlanPagos] = useState([]);
     const [selectedPlan, setSelectedPlan] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const user = useAuthStore((state) => state.user);
+    const { confirm, alert } = useConfirmation();
 
     useEffect(() => {
         if (user?.id) {
@@ -30,13 +32,21 @@ export default function HistoryPage() {
     };
 
     const handleDelete = async (planId) => {
-        if (window.confirm("¿Estás seguro de que deseas eliminar este plan de pagos? Esta acción no se puede deshacer.")) {
+        const isConfirmed = await confirm({
+            title: "Eliminar Simulación",
+            message: "¿Estás seguro de que deseas eliminar este plan de pagos? Esta acción no se puede deshacer.",
+            type: "warning",
+            confirmText: "Eliminar",
+            cancelText: "Cancelar"
+        });
+
+        if (isConfirmed) {
             try {
                 await deletePlanPago(planId);
                 setPlanPagos(planPagos.filter(p => p.id !== planId));
             } catch (error) {
                 console.error("Error eliminando plan:", error);
-                alert("Hubo un error al eliminar el plan.");
+                alert("Hubo un error al eliminar el plan.", "Error", "error");
             }
         }
     };
@@ -64,8 +74,8 @@ export default function HistoryPage() {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {planPagos.map((plan) => (
-                        <Card 
-                            key={plan.id} 
+                        <Card
+                            key={plan.id}
                             className="flex flex-col justify-between h-full hover:shadow-xl transition-all duration-300 border-l-4 border-l-blue-600 group"
                         >
                             <div className="p-2">
@@ -77,12 +87,12 @@ export default function HistoryPage() {
                                         {formatDate(plan.createdAt)}
                                     </span>
                                 </div>
-                                
+
                                 <h4 className="text-xl font-bold text-gray-800 mb-1 group-hover:text-blue-700 transition-colors">
                                     {plan.Local?.nombre}
                                 </h4>
                                 <p className="text-sm text-gray-500 mb-4 line-clamp-1">{plan.Local?.direccion}</p>
-                                
+
                                 <div className="bg-gray-50 p-3 rounded-lg border border-gray-100 mb-4">
                                     <p className="text-xs text-gray-500 uppercase font-bold mb-1">Monto del Préstamo</p>
                                     <p className="text-lg font-bold text-gray-800">{formatMoney(plan.monto_prestamo, plan.moneda)}</p>
@@ -139,33 +149,33 @@ export default function HistoryPage() {
                                 </h4>
                                 <ul className="space-y-3 text-sm text-gray-600">
                                     <li className="flex justify-between">
-                                        <span>Monto Préstamo:</span> 
+                                        <span>Monto Préstamo:</span>
                                         <span className="font-semibold text-gray-800">{formatMoney(selectedPlan.monto_prestamo, selectedPlan.moneda)}</span>
                                     </li>
                                     <li className="flex justify-between">
-                                        <span>Cuota Inicial:</span> 
+                                        <span>Cuota Inicial:</span>
                                         <span className="font-semibold text-gray-800">{formatMoney(selectedPlan.cuota_inicial, selectedPlan.moneda)}</span>
                                     </li>
                                     <li className="flex justify-between">
-                                        <span>Plazo:</span> 
+                                        <span>Plazo:</span>
                                         <span className="font-semibold text-gray-800">{selectedPlan.num_anios} años ({selectedPlan.total_cuotas} cuotas)</span>
                                     </li>
                                     <li className="flex justify-between">
-                                        <span>Frecuencia:</span> 
+                                        <span>Frecuencia:</span>
                                         <span className="font-semibold text-gray-800 capitalize">{selectedPlan.frecuencia_pago}</span>
                                     </li>
                                     <li className="flex justify-between">
-                                        <span>Tasa Interés:</span> 
+                                        <span>Tasa Interés:</span>
                                         <span className="font-semibold text-gray-800">
                                             {(parseFloat(selectedPlan.EntidadFinanciera?.tasa_interes) * 100).toFixed(2)}% ({selectedPlan.EntidadFinanciera?.tipo_tasa})
                                         </span>
                                     </li>
                                     <li className="flex justify-between">
-                                        <span>Periodo Gracia:</span> 
+                                        <span>Periodo Gracia:</span>
                                         <span className="font-semibold text-gray-800 text-right">
-                                            {selectedPlan.tipo_gracia !== "SIN_GRACIA" 
-                                                ? (selectedPlan.tipo_gracia === "TOTAL" ? "Total" : "Parcial") 
-                                                : "Sin Gracia"} 
+                                            {selectedPlan.tipo_gracia !== "SIN_GRACIA"
+                                                ? (selectedPlan.tipo_gracia === "TOTAL" ? "Total" : "Parcial")
+                                                : "Sin Gracia"}
                                             <span className="block text-xs font-normal text-gray-500">({selectedPlan.meses_gracia} meses)</span>
                                         </span>
                                     </li>
@@ -184,7 +194,7 @@ export default function HistoryPage() {
                                             <p className="text-xs text-gray-500">{selectedPlan.Local?.direccion}</p>
                                         </div>
                                         <div className="flex justify-between pt-2 border-t border-gray-100">
-                                            <span>Precio Venta:</span> 
+                                            <span>Precio Venta:</span>
                                             <span className="font-semibold text-gray-800">{formatMoney(selectedPlan.precio_venta, selectedPlan.moneda)}</span>
                                         </div>
                                     </div>
@@ -199,13 +209,13 @@ export default function HistoryPage() {
                                             <span className="font-semibold text-gray-800">{selectedPlan.EntidadFinanciera?.nombre}</span>
                                         </li>
                                         <li className="flex justify-between">
-                                            <span>Bono Techo Propio:</span> 
+                                            <span>Bono Techo Propio:</span>
                                             <span className={`font-semibold ${selectedPlan.EntidadFinanciera?.aplica_bono_techo_propio ? "text-green-600" : "text-gray-500"}`}>
                                                 {selectedPlan.EntidadFinanciera?.aplica_bono_techo_propio ? "Sí" : "No"}
                                             </span>
                                         </li>
                                         <li className="flex justify-between">
-                                            <span>Seguro Desgravamen:</span> 
+                                            <span>Seguro Desgravamen:</span>
                                             <span className="font-semibold text-gray-800">
                                                 {selectedPlan.EntidadFinanciera?.aplica_seguro_desgravamen ? "Sí" : "No"}
                                             </span>

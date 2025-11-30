@@ -5,10 +5,12 @@ import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
 import { postLogin } from "../api/auth.api";
 import { useAuthStore } from "../store/useAuthStore";
+import { useConfirmation } from "../context/ConfirmationContext";
 
 export default function Login() {
   const navigate = useNavigate();
   const login = useAuthStore((state) => state.login);
+  const { alert } = useConfirmation();
   const [form, setForm] = useState({ email: "", password: "" });
 
   const update = (e) => setForm({ ...form, [e.target.name]: e.target.value });
@@ -20,7 +22,7 @@ export default function Login() {
 
       // El backend debe devolver un token si todo está bien
       if (!data.token) {
-        alert(data.message || "Credenciales incorrectas");
+        alert(data.message || "Credenciales incorrectas", "Error", "error");
         return;
       }
       console.log("Login exitoso:", data);
@@ -29,7 +31,7 @@ export default function Login() {
       navigate("/");
     } catch (error) {
       console.error(error);
-      alert("Error de conexión con el servidor");
+      alert("Error de conexión con el servidor", "Error", "error");
     }
   };
 
@@ -41,21 +43,21 @@ export default function Login() {
           <p className="text-gray-600">Ingresa a tu portal financiero</p>
         </div>
 
-        <Input 
-          label="Email" 
-          name="email" 
+        <Input
+          label="Email"
+          name="email"
           type="email"
           placeholder="tu@email.com"
-          value={form.email} 
-          onChange={update} 
+          value={form.email}
+          onChange={update}
         />
-        <Input 
-          label="Contraseña" 
-          type="password" 
-          name="password" 
+        <Input
+          label="Contraseña"
+          type="password"
+          name="password"
           placeholder="••••••••"
-          value={form.password} 
-          onChange={update} 
+          value={form.password}
+          onChange={update}
         />
 
         <Button className="mt-6 w-full text-base py-3" onClick={onSubmit}>

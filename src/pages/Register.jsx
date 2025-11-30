@@ -5,10 +5,12 @@ import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
 import { postRegister } from "../api/auth.api";
 import { useAuthStore } from "../store/useAuthStore";
+import { useConfirmation } from "../context/ConfirmationContext";
 
 export default function Register() {
   const navigate = useNavigate();
   const login = useAuthStore((state) => state.login);
+  const { alert } = useConfirmation();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -26,7 +28,7 @@ export default function Register() {
     const data = resp.data;
 
     if (!data.success) {
-      alert("Error al registrar");
+      alert("Error al registrar", "Error", "error");
       return;
     }
     console.log("Registro exitoso:", data);
@@ -54,10 +56,10 @@ export default function Register() {
 
         <div>
           <p className="mt-6 pt-6 border-t border-gray-200 text-center">
-          ¿Ya tienes cuenta? <a className="text-green-600 hover:text-green-700 font-semibold hover:underline transition-colors" href="/login">Inicia Sesión</a>
+            ¿Ya tienes cuenta? <a className="text-green-600 hover:text-green-700 font-semibold hover:underline transition-colors" href="/login">Inicia Sesión</a>
           </p>
         </div>
-        
+
       </Card>
     </div>
   );

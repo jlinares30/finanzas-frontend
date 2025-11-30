@@ -6,11 +6,13 @@ import Input from "../components/ui/Input";
 import { getLocalById, updateLocal } from "../api/locales.api";
 import { useSimulationStore } from "../store/useSimulationStore";
 import { formatMoney } from "../utils/format";
+import { useConfirmation } from "../context/ConfirmationContext";
 
 export default function DetalleLocal() {
   const { localId, entidadId } = useParams();
   const navigate = useNavigate();
   const setSimulationData = useSimulationStore((state) => state.setSimulationData);
+  const { alert } = useConfirmation();
 
   const [local, setLocal] = useState(null);
   const [costoInicial, setCostoInicial] = useState(null);
@@ -29,7 +31,7 @@ export default function DetalleLocal() {
         console.log(data.local);
       } catch (error) {
         console.error(error);
-        alert("No se pudo cargar el detalle del local");
+        alert("No se pudo cargar el detalle del local", "Error", "error");
       }
     };
 
@@ -62,10 +64,10 @@ export default function DetalleLocal() {
       await updateLocal(localId, updatedLocal);
       setLocal(updatedLocal);
       setIsEditing(false);
-      alert("Datos actualizados correctamente.");
+      alert("Datos actualizados correctamente.", "Éxito", "success");
     } catch (error) {
       console.error("Error actualizando local:", error);
-      alert("No se pudo actualizar los datos.");
+      alert("No se pudo actualizar los datos.", "Error", "error");
     }
   };
 
@@ -81,7 +83,7 @@ export default function DetalleLocal() {
   return (
     <div className="p-8 space-y-6 max-w-6xl mx-auto">
       <div className="mb-8">
-        <button 
+        <button
           onClick={() => navigate(-1)}
           className="flex items-center gap-2 text-gray-600 hover:text-gray-800 mb-4 transition-colors"
         >
