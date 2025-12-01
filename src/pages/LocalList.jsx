@@ -27,11 +27,16 @@ export default function LocalList() {
         setLocales(allLocales);
 
         // Filter based on income if available
-        const ingresos = profileRes.data.ingresos_mensuales || profileRes.data.cliente?.ingresos_mensuales || 0;
-
+        const ingresos = profileRes.data.user.Socioeconomico.ingresos_mensuales || profileRes.data.user.Socioeconomico.ingresos_mensuales || 0;
         if (ingresos > 0) {
           const maxPrice = ingresos * 50;
-          const filtered = allLocales.filter(l => l.precio <= maxPrice);
+          const EXCHANGE_RATE = 3.5
+
+          const filtered = allLocales.filter(l => {
+            const priceInPen = l.moneda === 'USD' ? l.precio * EXCHANGE_RATE : l.precio;
+            return priceInPen <= maxPrice;
+          });
+
           setFilteredLocales(filtered);
         } else {
           setFilteredLocales(allLocales);
